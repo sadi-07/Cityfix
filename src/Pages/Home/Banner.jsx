@@ -39,7 +39,7 @@ const Banner = () => {
     ];
 
     return (
-        <div className="w-full min-h-[75vh] gap-10 lg:gap-2 flex flex-col-reverse lg:flex-row items-center justify-between px-6 lg:px-20 lg:my-20">
+        <div className="w-full min-h-[75vh] gap-10 lg:gap-2 flex flex-col-reverse lg:flex-row items-center justify-between px-6 lg:my-20">
 
             {/* LEFT SIDE */}
             <motion.div

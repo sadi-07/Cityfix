@@ -19,3 +19,7 @@ body {
 .bg-gradient {
     @apply bg-linear-to-r from-[#576BFE] to-[#27ACFE]
 }
+
+.text-gradient {
+  @apply bg-linear-to-r from-[#576BFE] to-[#27ACFE] bg-clip-text text-transparent;
+}
