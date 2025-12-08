@@ -34,7 +34,7 @@ const About = () => {
   return (
     <section className="px-6 lg:px-20 py-20">
       <motion.h2
-        className="text-3xl lg:text-6xl font-bold text-left mb-16 text-gray-800"
+        className="text-5xl lg:text-6xl font-bold text-left mb-16 text-gray-800"
         initial={{ y: -20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         viewport={{ once: true }}
