@@ -5,6 +5,7 @@ import Login from "../Pages/Auth/Login";
 import AllIssues from "../Pages/AllIssues/AllIssues";
 import About from "../Pages/Home/About";
 import ContactUs from "../Pages/Home/ContactUs";
+import Error404 from "../Components/Shared/Error404";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       { 
         path: "/contact",
         element: <ContactUs></ContactUs>
+      },
+      {
+        path: "*",
+        element: <Error404></Error404>,
       },
     ]
   }

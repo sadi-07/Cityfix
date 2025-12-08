@@ -8,8 +8,8 @@ const stats = [
 
 const Impact = () => {
   return (
-    <div className="py-16 bg-gradient text-white px-6 lg:px-20 text-center rounded-2xl">
-      <h2 className="text-3xl lg:text-5xl font-extrabold mb-12">
+    <div className="py-16 bg-gradient text-white px-6 lg:px-20 text-center rounded-2xl mx-4 lg:mx-0">
+      <h2 className="text-4xl lg:text-5xl font-extrabold mb-12">
         Our Community Impact
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">

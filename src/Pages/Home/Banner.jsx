@@ -39,7 +39,7 @@ const Banner = () => {
     ];
 
     return (
-        <div className="w-full min-h-[75vh] gap-10 lg:gap-2 flex flex-col-reverse lg:flex-row items-center justify-between px-6 lg:my-20">
+        <div className="w-full min-h-[75vh] gap-10 lg:gap-2 flex flex-col lg:flex-row items-center justify-between px-6 lg:my-20">
 
             {/* LEFT SIDE */}
             <motion.div
@@ -49,7 +49,7 @@ const Banner = () => {
                 className="lg:w-1/2 text-center lg:text-left space-y-5"
             >
                 <motion.h1
-                    className="text-4xl lg:text-6xl font-bold leading-tight"
+                    className="text-5xl md:text-6xl mt-20 lg:mt-0 font-extrabold leading-tight"
                     whileHover={{ scale: 1.03 }}
                 >
                     Fix Your City,

@@ -28,8 +28,8 @@ const HowItWorks = () => {
     }, []);
 
     return (
-        <div className="my-20">
-            <h2 className="text-3xl lg:text-5xl font-extrabold text-center mb-10 text-gradient">
+        <div className="my-20 mx-4 lg:mx-0">
+            <h2 className="text-4xl lg:text-5xl font-extrabold text-center mb-10 text-gradient">
                 How It Works
             </h2>
             <div className="px-6 lg:px-20 py-16 bg-gray-100 rounded-2xl">

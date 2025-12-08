@@ -44,7 +44,7 @@ const Features = () => {
 
     return (
         <div>
-            <h2 className="text-3xl lg:text-5xl font-extrabold text-center mb-10 text-gradient">
+            <h2 className="text-4xl lg:text-5xl font-extrabold text-center my-10  text-gradient">
                 Powerful Features for a Better City
             </h2>
             <div className="px-4 sm:px-6 lg:px-20 py-16 bg-gray-100 rounded-2xl">

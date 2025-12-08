@@ -1,45 +1,45 @@
-import React from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 
 const Error404 = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
-      
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-6 py-10 text-center">
+      {/* Animated GIF */}
       <motion.img
+        src="https://media.tenor.com/Qxi2surCOLcAAAAM/slow-down-sign.gif" // Replace with your relevant GIF
+        alt="404 Not Found"
+        className="w-80 h-80 mb-8"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        src="https://i.imgur.com/qIufhof.gif"
-        alt="404 Error"
-        className="w-72 md:w-96 mb-6"
+        transition={{ duration: 0.8, type: "spring", stiffness: 120 }}
       />
-      <motion.h1 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.6 }}
-        className="text-4xl md:text-6xl font-bold text-center"
-      >
-        <span className="text-primary">404</span> — Page Not Found
-      </motion.h1>
 
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
-        className="text-gray-600 font-bold text-xl text-center mt-4"
+      {/* Error Text */}
+      <motion.h1
+        className="text-5xl font-bold mb-4 text-gray-800"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6 }}
       >
-        Oops! Looks like this page doesn't exist.
+        404
+      </motion.h1>
+      <motion.p
+        className="text-gray-600 mb-8 text-lg"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        Oops! The page you are looking for does not exist.
       </motion.p>
 
+      {/* Back to Home Button */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.6 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         <Link
           to="/"
-          className="btn mt-6 px-7 py-7 text-white rounded-lg shadow-md text-lg font-semibold transition"
+          className="px-8 py-3 bg-primary text-white font-semibold rounded-xl text-xl shadow-md hover:bg-secondary transition"
         >
           Back to Home
         </Link>
