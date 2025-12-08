@@ -11,52 +11,52 @@ const Navbar = () => {
     const handleLogout = () => removeUser();
 
     const commonLinks = (
-    <>
-        <li>
-            <NavLink
-                to="/"
-                className={({ isActive }) =>
-                    `text-lg font-semibold ${isActive ? "text-[#576BFE]" : "text-gray-600"}`
-                }
-            >
-                Home
-            </NavLink>
-        </li>
+        <>
+            <li>
+                <NavLink
+                    to="/"
+                    className={({ isActive }) =>
+                        `text-lg font-semibold ${isActive ? "text-[#576BFE]" : "text-gray-600"}`
+                    }
+                >
+                    Home
+                </NavLink>
+            </li>
 
-        <li>
-            <NavLink
-                to="/all-issues"
-                className={({ isActive }) =>
-                    `text-lg font-semibold ${isActive ? "text-[#576BFE]" : "text-gray-600"}`
-                }
-            >
-                All Issues
-            </NavLink>
-        </li>
+            <li>
+                <NavLink
+                    to="/all-issues"
+                    className={({ isActive }) =>
+                        `text-lg font-semibold ${isActive ? "text-[#576BFE]" : "text-gray-600"}`
+                    }
+                >
+                    All Issues
+                </NavLink>
+            </li>
 
-        <li>
-            <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                    `text-lg font-semibold ${isActive ? "text-[#576BFE]" : "text-gray-600"}`
-                }
-            >
-                About
-            </NavLink>
-        </li>
+            <li>
+                <NavLink
+                    to="/about"
+                    className={({ isActive }) =>
+                        `text-lg font-semibold ${isActive ? "text-[#576BFE]" : "text-gray-600"}`
+                    }
+                >
+                    About
+                </NavLink>
+            </li>
 
-        <li>
-            <NavLink
-                to="/contact"
-                className={({ isActive }) =>
-                    `text-lg font-semibold ${isActive ? "text-[#576BFE]" : "text-gray-600"}`
-                }
-            >
-                Contact Us
-            </NavLink>
-        </li>
-    </>
-);
+            <li>
+                <NavLink
+                    to="/contact"
+                    className={({ isActive }) =>
+                        `text-lg font-semibold ${isActive ? "text-[#576BFE]" : "text-gray-600"}`
+                    }
+                >
+                    Contact Us
+                </NavLink>
+            </li>
+        </>
+    );
 
     const privateLinks = (
         <>
@@ -67,7 +67,7 @@ const Navbar = () => {
                     </Link>
                 )}
             </Menu.Item>
-            
+
             <Menu.Item>
                 {({ active }) => (
                     <button onClick={handleLogout} className={`${active ? "bg-gray-700/40" : ""} group flex rounded-md w-full px-4 py-2 text-sm text-red-400`}>
@@ -93,8 +93,6 @@ const Navbar = () => {
                             {commonLinks}
 
 
-
-
                         </ul>
                     </div>
                     <Logo></Logo>
@@ -104,14 +102,12 @@ const Navbar = () => {
                         {commonLinks}
 
 
-
-
                     </ul>
                 </div>
 
                 <div className="navbar-end">
                     {!user ? (
-                        <Link to="/login" className="btn px-6 py-2 lg:flex">Log In</Link>
+                        <Link to="/login" className="btn bg-gradient text-xl text-white font-extrabold rounded-lg px-9 py-6 lg:flex">Log In</Link>
                     ) : (
                         <Menu as="div" className="relative">
                             <Menu.Button className="rounded-full w-12 h-12 overflow-hidden border border-primary cursor-pointer">
@@ -143,8 +139,8 @@ const Navbar = () => {
                             </Transition>
                         </Menu>
                     )}
-                    
-                
+
+
                 </div>
             </div>
         </div>

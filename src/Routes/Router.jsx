@@ -6,6 +6,7 @@ import AllIssues from "../Pages/AllIssues/AllIssues";
 import About from "../Pages/Home/About";
 import ContactUs from "../Pages/Home/ContactUs";
 import Error404 from "../Components/Shared/Error404";
+import Register from "../Pages/Auth/Register";
 
 const router = createBrowserRouter([
   {
@@ -15,10 +16,6 @@ const router = createBrowserRouter([
       { 
         path: "/",
         element: <Home />
-      },
-      { 
-        path: "/login",
-        element: <Login />
       },
       { 
         path: "/all-issues",
@@ -37,6 +34,14 @@ const router = createBrowserRouter([
         element: <Error404></Error404>,
       },
     ]
+  },
+  {
+    path: "/login",
+    element: <Login></Login>
+  },
+  {
+    path: "/signup",
+    element: <Register></Register>
   }
 ]);
 
