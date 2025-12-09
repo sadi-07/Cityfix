@@ -1,11 +1,77 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { Link } from "react-router";
-import white from "../../assets/logo-white-removebg-preview.png"
+import { Link, useNavigate, useLocation } from "react-router";
+import white from "../../assets/logo-white-removebg-preview.png";
+import { useForm } from "react-hook-form";
+import { AuthContext } from "../../Context/AuthProvider";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [showPass, setShowPass] = useState(false);
+  const [btnLoading, setBtnLoading] = useState(false);
+
+  const { logInUser, GUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state || "/";
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  // Handle Login
+  const onSubmit = async (data) => {
+    const { email, password } = data;
+
+    try {
+      setBtnLoading(true);
+
+      await logInUser(email, password);
+
+      toast.success("Login Successful!");
+      navigate(from, { replace: true });
+
+    } catch (err) {
+      console.log("Login Error:", err);
+
+      if (err.code === "auth/user-not-found") {
+        toast.error("No user found with this email.");
+        return;
+      }
+
+      if (err.code === "auth/wrong-password") {
+        toast.error("Incorrect password!");
+        return;
+      }
+
+      if (err.code === "auth/invalid-email") {
+        toast.error("Invalid email format.");
+        return;
+      }
+
+      toast.error("Login failed. Try again.");
+    } finally {
+      setBtnLoading(false);
+    }
+  };
+
+  // Google Login Handler
+  const handleGoogleLogin = async () => {
+    try {
+      setBtnLoading(true);
+      await GUser();
+      toast.success("Login Successful!");
+      navigate(from, { replace: true });
+    } catch (err) {
+      console.log(err);
+      toast.error("Google login failed!");
+    } finally {
+      setBtnLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient py-10">
@@ -16,13 +82,13 @@ const Login = () => {
         className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-10 w-full max-w-md border border-gray-200 dark:border-gray-700"
       >
         <motion.h2 className="text-4xl font-bold text-center text-gray-800 dark:text-white mb-8">
-            <Link to="/">
-                <img className="h-20 w-50 mx-auto mb-8" src={white} alt="" />
-            </Link>
-            Welcome Back
+          <Link to="/">
+            <img className="h-20 w-50 mx-auto mb-8" src={white} alt="" />
+          </Link>
+          Welcome Back
         </motion.h2>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
           {/* Email */}
           <div>
@@ -33,7 +99,15 @@ const Login = () => {
                 type="email"
                 placeholder="Enter your email"
                 className="w-full pl-10 pr-4 py-3 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Please enter a valid email",
+                  },
+                })}
               />
+              {errors.email && <p className="text-red-500 mt-1">{errors.email.message}</p>}
             </div>
           </div>
 
@@ -46,6 +120,9 @@ const Login = () => {
                 type={showPass ? "text" : "password"}
                 placeholder="Enter your password"
                 className="w-full pl-10 pr-12 py-3 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary"
+                {...register("password", {
+                  required: "Password is required",
+                })}
               />
               <button
                 type="button"
@@ -54,14 +131,19 @@ const Login = () => {
               >
                 {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
+              {errors.password && (
+                <p className="text-red-500 mt-1">{errors.password.message}</p>
+              )}
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold shadow-md mt-3 text-lg cursor-pointer"
+            className={`w-full bg-primary hover:bg-secondary text-white py-3 rounded-lg font-semibold shadow-md mt-3 text-lg cursor-pointer ${
+              btnLoading && "opacity-70 cursor-not-allowed"
+            }`}
           >
-            Login
+            {btnLoading ? "Loading..." : "Login"}
           </button>
         </form>
 
@@ -73,9 +155,13 @@ const Login = () => {
 
         {/* Google Login */}
         <button
+          onClick={handleGoogleLogin}
           className="w-full py-3 flex items-center justify-center gap-3 bg-white rounded-lg shadow-md cursor-pointer text-lg font-semibold"
         >
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" />
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            className="w-6 h-6"
+          />
           Continue with Google
         </button>
 

@@ -78,7 +78,7 @@ const Navbar = () => {
         </>
     );
 
-
+console.log(user)
     return (
         <div className='sticky top-0 z-40 shadow-sm bg-base-200'>
             <div className="navbar max-w-7xl mx-auto max-h-18 px-6">

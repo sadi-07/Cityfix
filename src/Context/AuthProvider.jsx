@@ -23,10 +23,16 @@ const AuthProvider = ({ children }) => {
 
   // CREATE USER
   const createUser = async (email, password) => {
-    setLoading(true);
+  //setLoading(true);
+  try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     return result;
-  };
+  } catch (err) {
+    setLoading(false);
+    throw err; // bubble error to Register.jsx
+  }
+};
+
 
   
   const updateUserProfile = async (name, photoURL) => {
@@ -39,7 +45,7 @@ const AuthProvider = ({ children }) => {
 
   // GOOGLE LOGIN
   const GUser = async () => {
-    setLoading(true);
+    //setLoading(true);
     const result = await signInWithPopup(auth, googleProvider);
     setUser(result.user);
     setLoading(false);
@@ -75,12 +81,17 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, setUser,
-      createUser, updateUserProfile,
-      GUser, logInUser, removeUser,
-      loading, setLoading
+      user,
+      setUser,
+      createUser,
+      updateUserProfile,
+      GUser,
+      logInUser,
+      removeUser,
+      loading,
+      setLoading
     }}>
-      {loading ? <Loading /> : children}
+      {loading && !user ? <Loading /> : children}
     </AuthContext.Provider>
   );
 };

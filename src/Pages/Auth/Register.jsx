@@ -1,12 +1,128 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, User, Image as ImageIcon } from "lucide-react";
-import { Link } from "react-router";
+import { Link, replace, useLocation, useNavigate } from "react-router";
 import Logo from "../../Components/Shared/Logo";
 import white from "../../assets/logo-white-removebg-preview.png"
+import { useForm } from "react-hook-form";
+import { AuthContext } from "../../Context/AuthProvider";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { imageUpload } from "../../Utils";
 
 const Register = () => {
     const [showPass, setShowPass] = useState(false);
+    const [btnLoading, setBtnLoading] = useState(false);
+
+    const { createUser, updateUserProfile, GUser, loading } = useContext(AuthContext);
+    const navigate = useNavigate()
+    const location = useLocation()
+    const from = location.state || '/'
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm()
+
+    const onSubmit = async (data) => {
+        const { name, image, email, password } = data;
+
+        const imageFile = image[0]
+        // const formData = new FormData()
+        // formData.append('image', imageFile)
+
+        try {
+            setBtnLoading(true);
+
+            // Upload image to imgBB
+            // const data = await axios.post(
+            //     `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+            //     formData
+            // );
+
+            const imageURL = await imageUpload(imageFile);
+
+            // Firebase create user
+            const result = await createUser(email, password);
+
+            // Update profile
+            await updateUserProfile(name, imageURL);
+
+            toast.success("Signup Successful!");
+            navigate(from, { replace: true });
+
+        } catch (err) {
+            console.log("Registration Error:", err);
+
+            // Firebase: email already registered
+            if (err.code === "auth/email-already-in-use") {
+                toast.error("This email is already registered!");
+                return;
+            }
+
+            // Firebase: weak password
+            if (err.code === "auth/weak-password") {
+                toast.error("Password must be at least 6 characters.");
+                return;
+            }
+
+            // Firebase: invalid email format
+            if (err.code === "auth/invalid-email") {
+                toast.error("Invalid email format.");
+                return;
+            }
+
+            // Axios: server responded with an error
+            if (err.response && err.response.data) {
+                toast.error(err.response.data?.error?.message || "Image upload failed!");
+                return;
+            }
+
+            // Axios: Network issues
+            if (err.message === "Network Error") {
+                toast.error("Network error. Please check your internet.");
+                return;
+            }
+
+            // Default fallback
+            toast.error("Something went wrong. Try again.");
+        }
+        finally {
+            setBtnLoading(false);
+        }
+    }
+
+    const handleGoogleSignup = async () => {
+        try {
+            setBtnLoading(true);
+            const result = await GUser();
+
+            const user = result.user;
+
+            // Update profile (Google already provides name & photo)
+            await updateUserProfile(
+                user.displayName,
+                user.photoURL
+            );
+
+            toast.success("Signup Successful!");
+            navigate(from, { replace: true });
+
+        } catch (err) {
+            console.log("Google Signup Error:", err);
+
+            if (err.code === "auth/popup-closed-by-user") {
+                toast.error("Popup closed before signing in.");
+                return;
+            }
+
+            toast.error("Google signup failed. Try again.");
+        } finally {
+            setBtnLoading(false);
+        }
+    };
+
 
     return (
         <div className="min-h-screen flex items-center justify-center px-4 bg-gradient py-10">
@@ -23,7 +139,7 @@ const Register = () => {
                     Create an Account
                 </motion.h2>
 
-                <form className="space-y-5">
+                <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
                     {/* Full Name */}
                     <div>
@@ -34,7 +150,17 @@ const Register = () => {
                                 type="text"
                                 placeholder="Enter your full name"
                                 className="w-full pl-10 pr-4 py-3 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary"
+                                {...register('name', {
+                                    required: 'Name is required',
+                                    maxLength: {
+                                        value: 20,
+                                        message: 'Name must contain less than 20 characters'
+                                    },
+                                })}
                             />
+                            {errors.name && (
+                                <p className="text-red-500 mt-1">{errors.name.message}</p>
+                            )}
                         </div>
                     </div>
 
@@ -46,6 +172,7 @@ const Register = () => {
                             <input
                                 type="file"
                                 className="w-full pl-10 pr-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white"
+                                {...register('image')}
                             />
                         </div>
                     </div>
@@ -59,7 +186,17 @@ const Register = () => {
                                 type="email"
                                 placeholder="Enter your email"
                                 className="w-full pl-10 pr-4 py-3 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary"
+                                {...register('email', {
+                                    required: 'Email is required',
+                                    pattern: {
+                                        value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                                        message: 'Please enter a valid email address',
+                                    },
+                                })}
                             />
+                            {errors.email && (
+                                <p className="text-red-500 mt-1">{errors.email.message}</p>
+                            )}
                         </div>
                     </div>
 
@@ -72,6 +209,13 @@ const Register = () => {
                                 type={showPass ? "text" : "password"}
                                 placeholder="Enter your password"
                                 className="w-full pl-10 pr-12 py-3 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary"
+                                {...register('password', {
+                                    required: 'Password is required',
+                                    minLength: {
+                                        value: 6,
+                                        message: 'Password must be atleast 6 characters'
+                                    }
+                                })}
                             />
                             <button
                                 type="button"
@@ -80,14 +224,18 @@ const Register = () => {
                             >
                                 {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
+                            {errors.password && (
+                                <p className="text-red-500 mt-1">{errors.password.message}</p>
+                            )}
                         </div>
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-primary hover:bg-secondary text-white py-3 rounded-lg font-semibold shadow-md mt-3 text-lg cursor-pointer"
+                        className={`w-full bg-primary hover:bg-secondary text-white py-3 rounded-lg font-semibold shadow-md mt-3 text-lg cursor-pointer 
+                            ${btnLoading && "opacity-70 cursor-not-allowed"}`}
                     >
-                        Register
+                        {btnLoading ? "Loading..." : "Register"}
                     </button>
                 </form>
 
@@ -99,11 +247,18 @@ const Register = () => {
 
                 {/* Google Login */}
                 <button
-                    className="w-full py-3 flex items-center justify-center gap-3 bg-white rounded-lg shadow-md cursor-pointer text-lg font-semibold"
+                    onClick={handleGoogleSignup}
+                    disabled={btnLoading}
+                    className={`w-full py-3 flex items-center justify-center gap-3 bg-white rounded-lg shadow-md cursor-pointer text-lg font-semibold
+        ${btnLoading && "opacity-70 cursor-not-allowed"}`}
                 >
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" />
-                    Continue with Google
+                    <img
+                        src="https://www.svgrepo.com/show/475656/google-color.svg"
+                        className="w-6 h-6"
+                    />
+                    {btnLoading ? "Loading..." : "Continue with Google"}
                 </button>
+
 
                 <p className="text-center text-base text-gray-600 dark:text-gray-300 mt-6">
                     Already have an account?{" "}
