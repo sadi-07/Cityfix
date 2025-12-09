@@ -14,6 +14,12 @@ import Dashboard from "../Layouts/Dashboard";
 import Profile from "../Pages/Dashboard/Citizen/Profile";
 import MyIssues from "../Pages/Dashboard/Citizen/MyIssues";
 import ReportIssue from "../Pages/Dashboard/Citizen/ReportIssue";
+import AdminRoute from "./AdminRoute";
+import StaffRoute from "./StaffRoute";
+import AllIssuesAdmin from "../Pages/Dashboard/Admin/AllIssuesAdmin";
+import ManageStaffs from "../Pages/Dashboard/Admin/ManageStaffs";
+import ManageUsers from "../Pages/Dashboard/Admin/ManageUsers";
+import AssignedIssues from "../Pages/Dashboard/Staff/AssignedIssues";
 
 
 
@@ -33,7 +39,7 @@ const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Register /> },
 
-  // 🔥 Dashboard Route (Protected)
+  // Dashboard Route
   {
     path: "/dashboard",
     element: (
@@ -43,13 +49,18 @@ const router = createBrowserRouter([
     ),
 
     children: [
-       { path: "profile", element: <Profile /> },
-       { path: "report-issue", element: <ReportIssue /> },
-       { path: "my-issues", element: <MyIssues /> },
+      { path: "profile", element: <Profile /> },
+      { path: "report-issue", element: <ReportIssue /> },
+      { path: "my-issues", element: <MyIssues /> },
 
-      // ⚠ Admin/staff pages can be added later
-      // { path: "all-users", element: <AdminRoute><AllUsers /></AdminRoute> },
-      // { path: "assigned-issues", element: <StaffRoute><AssignedIssues /></StaffRoute> },
+      // Staff
+      { path: "assigned-issues", element: <StaffRoute><AssignedIssues /></StaffRoute> },
+
+      // Admin
+      { path: "all-issues", element: <AdminRoute><AllIssuesAdmin /></AdminRoute> },
+      { path: "manage-users", element: <AdminRoute><ManageUsers /></AdminRoute> },
+      { path: "manage-staffs", element: <AdminRoute><ManageStaffs /></AdminRoute> },
+
     ],
   },
 ]);

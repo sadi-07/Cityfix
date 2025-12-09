@@ -21,6 +21,8 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const backendURL = "http://localhost:3000";
+
   // CREATE USER
   const createUser = async (email, password) => {
   //setLoading(true);
@@ -40,6 +42,8 @@ const AuthProvider = ({ children }) => {
 
     await updateProfile(auth.currentUser, { displayName: name, photoURL });
     await auth.currentUser.reload();
+
+    // 🔥 FIX: Update local user object
     setUser({ ...auth.currentUser });
   };
 
@@ -70,14 +74,56 @@ const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const loadUserFromDB = async (uid) => {
+    try {
+      const res = await fetch(`${backendURL}/users/${uid}`);
+      if (!res.ok) return; // if user not in DB yet
+
+      const dbUser = await res.json();
+
+      // 🔥 Combine Firebase user + MongoDB user
+      setUser({
+        ...auth.currentUser,
+        role: dbUser.role,
+        name: dbUser.name,
+        photoURL: dbUser.photoURL
+      });
+
+    } catch (err) {
+      console.error("Failed to load user role:", err);
+    }
+  };
+
   // ON AUTH CHANGE
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsub();
-  }, []);
+  const unsub = onAuthStateChanged(auth, async (currentUser) => {
+
+    if (currentUser) {
+      try {
+        const res = await fetch(`http://localhost:3000/users/${currentUser.email}`);
+        const dbUser = await res.json();
+
+        // Merge Firebase + MongoDB user
+        setUser({
+          ...currentUser,
+          role: dbUser.role || "citizen",
+          photoURL: dbUser.photo,
+          name: dbUser.name
+        });
+      } catch (err) {
+        console.log("Failed to load DB user:", err);
+        setUser(currentUser);
+      }
+    } else {
+      setUser(null);
+    }
+
+    setLoading(false);
+  });
+
+  return () => unsub();
+}, []);
+
 
   return (
     <AuthContext.Provider value={{
