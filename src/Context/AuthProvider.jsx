@@ -37,14 +37,14 @@ const AuthProvider = ({ children }) => {
 
 
   
-  const updateUserProfile = async (name, photoURL) => {
+  const updateUserProfile = async (name, photoURL, role = "citizen") => {
     if (!auth.currentUser) return;
 
     await updateProfile(auth.currentUser, { displayName: name, photoURL });
     await auth.currentUser.reload();
 
     // 🔥 FIX: Update local user object
-    setUser({ ...auth.currentUser });
+    setUser({ ...auth.currentUser, role });
   };
 
   // GOOGLE LOGIN

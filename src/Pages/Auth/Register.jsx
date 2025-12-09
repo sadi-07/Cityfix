@@ -47,7 +47,7 @@ const Register = () => {
             const result = await createUser(email, password);
 
             // Update profile
-            await updateUserProfile(name, imageURL);
+            await updateUserProfile(name, imageURL, "citizen");
 
             // Save user to MongoDB
             await axios.post("http://localhost:3000/users", {
