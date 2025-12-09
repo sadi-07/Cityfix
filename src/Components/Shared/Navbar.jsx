@@ -62,7 +62,7 @@ const Navbar = () => {
         <>
             <Menu.Item>
                 {({ active }) => (
-                    <Link to="/addFood" className={`${active ? "bg-gray-700/40" : ""} group flex rounded-md w-full px-4 py-2 text-base text-gray-300`}>
+                    <Link to="/dashboard" className={`${active ? "bg-gray-700/40" : ""} group flex rounded-md w-full px-4 py-2 text-base text-gray-300`}>
                         Dashboard
                     </Link>
                 )}

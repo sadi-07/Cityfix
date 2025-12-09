@@ -49,8 +49,19 @@ const Register = () => {
             // Update profile
             await updateUserProfile(name, imageURL);
 
+            // Save user to MongoDB
+            await axios.post("http://localhost:3000/users", {
+                name,
+                email,
+                photo: imageURL,
+                role: "citizen",
+                createdAt: new Date()
+            });
+
+            // Success
             toast.success("Signup Successful!");
             navigate(from, { replace: true });
+
 
         } catch (err) {
             console.log("Registration Error:", err);
@@ -106,8 +117,18 @@ const Register = () => {
                 user.photoURL
             );
 
+            // Save Google user to MongoDB
+            await axios.post("http://localhost:3000/users", {
+                name: user.displayName,
+                email: user.email,
+                photo: user.photoURL,
+                role: "citizen",
+                createdAt: new Date()
+            });
+
             toast.success("Signup Successful!");
             navigate(from, { replace: true });
+
 
         } catch (err) {
             console.log("Google Signup Error:", err);
