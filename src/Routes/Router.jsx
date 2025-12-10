@@ -20,6 +20,7 @@ import AllIssuesAdmin from "../Pages/Dashboard/Admin/AllIssuesAdmin";
 import ManageStaffs from "../Pages/Dashboard/Admin/ManageStaffs";
 import ManageUsers from "../Pages/Dashboard/Admin/ManageUsers";
 import AssignedIssues from "../Pages/Dashboard/Staff/AssignedIssues";
+import IssueDetails from "../Pages/AllIssues/IssueDetails";
 
 
 
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/all-issues", element: <AllIssues /> },
+      { path: "/issues/:id", element: 
+      <PrivateRoute>
+        <IssueDetails></IssueDetails>
+      </PrivateRoute> },
       { path: "/about", element: <About /> },
       { path: "/contact", element: <ContactUs /> },
       { path: "*", element: <Error404 /> },
