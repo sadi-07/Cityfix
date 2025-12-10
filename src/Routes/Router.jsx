@@ -21,6 +21,9 @@ import ManageStaffs from "../Pages/Dashboard/Admin/ManageStaffs";
 import ManageUsers from "../Pages/Dashboard/Admin/ManageUsers";
 import AssignedIssues from "../Pages/Dashboard/Staff/AssignedIssues";
 import IssueDetails from "../Pages/AllIssues/IssueDetails";
+import PaymentsPage from "../Pages/Dashboard/Admin/Payments";
+import AdminProfile from "../Pages/Dashboard/Admin/AdminProfile";
+import StaffProfile from "../Pages/Dashboard/Staff/StaffProfile";
 
 
 
@@ -60,11 +63,14 @@ const router = createBrowserRouter([
 
       // Staff
       { path: "assigned-issues", element: <StaffRoute><AssignedIssues /></StaffRoute> },
+      { path: "staff-profile", element: <StaffRoute><StaffProfile /></StaffRoute> },
 
       // Admin
       { path: "all-issues", element: <AdminRoute><AllIssuesAdmin /></AdminRoute> },
       { path: "manage-users", element: <AdminRoute><ManageUsers /></AdminRoute> },
       { path: "manage-staffs", element: <AdminRoute><ManageStaffs /></AdminRoute> },
+      { path: "payments", element: <AdminRoute><PaymentsPage /></AdminRoute> },
+      { path: "admin-profile", element: <AdminRoute><AdminProfile /></AdminRoute> },
 
     ],
   },

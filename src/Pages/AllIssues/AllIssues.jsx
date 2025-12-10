@@ -3,6 +3,7 @@ import { AuthContext } from "../../Context/AuthProvider";
 import { Link, useNavigate } from "react-router";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const AllIssues = () => {
   const [filteredIssues, setFilteredIssues] = useState([]);
@@ -51,7 +52,7 @@ const AllIssues = () => {
     setFilteredIssues(data);
   }, [category, status, priority, search, issues]);
 
-  // 🔥 Upvote Mutation (TANSTACK QUERY)
+  // Upvote Mutation (TANSTACK QUERY)
   const upvoteMutation = useMutation({
     mutationFn: async (issue) => {
       if (!user) return navigate("/login");
@@ -72,10 +73,10 @@ const AllIssues = () => {
     if (!user) return navigate("/login");
 
     if (issue.email === user.email)
-      return alert("You cannot upvote your own issue!");
+      return toast.error("You cannot upvote your own issue!");
 
     if (issue?.upvotedBy?.includes(user.email))
-      return alert("You already upvoted this!");
+      return toast.error("You already upvoted this!");
 
     upvoteMutation.mutate(issue);
   };
