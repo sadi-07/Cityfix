@@ -12,29 +12,29 @@ const AllIssuesAdmin = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState("");
 
-  // Fetch all issues
+  // ⭐ FIXED — Correct backend route
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["all-issues"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:5000/issues");
+      const res = await fetch("http://localhost:3000/issues");
       return res.json();
     },
   });
 
-  // Fetch all staff
+  // ⭐ Fetch staff
   const { data: staffList = [] } = useQuery({
     queryKey: ["staff"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:5000/users?role=staff");
+      const res = await fetch("http://localhost:3000/users?role=staff");
       return res.json();
     },
   });
 
-  // Mutation: Assign Staff
+  // ⭐ Assign Staff Mutation
   const assignStaffMutation = useMutation({
     mutationFn: async ({ issueId, staff }) => {
       const res = await fetch(
-        `http://localhost:5000/issues/assign-staff/${issueId}`,
+        `http://localhost:3000/issues/assign-staff/${issueId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -46,14 +46,14 @@ const AllIssuesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["all-issues"]);
       setShowModal(false);
-      Swal.fire("Assigned!", "Staff successfully assigned", "success");
+      Swal.fire("Success!", "Staff assigned successfully", "success");
     },
   });
 
-  // Mutation: Reject Issue
+  // ⭐ Reject issue Mutation
   const rejectMutation = useMutation({
     mutationFn: async (id) => {
-      const res = await fetch(`http://localhost:5000/issues/reject/${id}`, {
+      const res = await fetch(`http://localhost:3000/issues/reject/${id}`, {
         method: "PATCH",
       });
       return res.json();
@@ -64,18 +64,24 @@ const AllIssuesAdmin = () => {
     },
   });
 
-  if (isLoading) return <Loading></Loading>;
+  if (isLoading) return <Loading />;
 
-  // Boosted issues first
-  const sortedIssues = [...issues].sort((a, b) =>
-    a.priority === "high" ? -1 : 1
-  );
+  // ⭐ Correct sorting logic
+  const sortedIssues = [...issues].sort((a, b) => {
+    const aHigh = a.priority === "high";
+    const bHigh = b.priority === "high";
+    if (aHigh && !bHigh) return -1;
+    if (!aHigh && bHigh) return 1;
+    return 0;
+  });
+
+  console.log(sortedIssues);
 
   return (
     <div>
       <h2 className="text-3xl font-bold mb-5">All Issues (Admin)</h2>
 
-      {/* Issues Table */}
+      {/* Table */}
       <div className="overflow-x-auto mt-6">
         <table className="w-full border">
           <thead className="bg-gray-200">
@@ -95,6 +101,7 @@ const AllIssuesAdmin = () => {
                 <td className="p-2 border">{issue.title}</td>
                 <td className="p-2 border">{issue.category}</td>
                 <td className="p-2 border">{issue.status}</td>
+
                 <td
                   className={`p-2 border ${
                     issue.priority === "high"
@@ -106,14 +113,17 @@ const AllIssuesAdmin = () => {
                 </td>
 
                 <td className="p-2 border">
-                  {issue.assignedStaff
-                    ? `${issue.assignedStaff.name} (${issue.assignedStaff.email})`
-                    : "Not assigned"}
+                  {issue.assignedStaff ? (
+                    `${issue.assignedStaff.name} (${issue.assignedStaff.email})`
+                  ) : (
+                    <span className="text-gray-500">Not assigned</span>
+                  )}
                 </td>
 
                 <td className="p-2 border flex gap-2">
-                  {/* Assign Staff Button */}
-                  {!issue.assignedStaff && (
+
+                  {/* Assign Staff */}
+                  {!issue.assignedStaff && issue.status !== "rejected" && (
                     <button
                       onClick={() => {
                         setSelectedIssue(issue);
@@ -121,22 +131,22 @@ const AllIssuesAdmin = () => {
                       }}
                       className="px-3 py-1 bg-blue-600 text-white rounded"
                     >
-                      Assign Staff
+                      Assign
                     </button>
                   )}
 
-                  {/* Reject Button */}
+                  {/* Reject */}
                   {issue.status === "pending" && (
                     <button
                       onClick={() =>
                         Swal.fire({
-                          title: "Reject Issue?",
+                          title: "Reject this issue?",
                           text: "This action cannot be undone.",
                           icon: "warning",
                           showCancelButton: true,
                           confirmButtonText: "Yes, reject",
-                        }).then((res) => {
-                          if (res.isConfirmed) {
+                        }).then((result) => {
+                          if (result.isConfirmed) {
                             rejectMutation.mutate(issue._id);
                           }
                         })
@@ -166,7 +176,7 @@ const AllIssuesAdmin = () => {
               className="w-full border p-2 rounded"
               onChange={(e) => setSelectedStaff(e.target.value)}
             >
-              <option>Select One</option>
+              <option value="">Select One</option>
               {staffList.map((staff) => (
                 <option key={staff._id} value={staff._id}>
                   {staff.name} ({staff.email})
@@ -183,13 +193,14 @@ const AllIssuesAdmin = () => {
               </button>
 
               <button
+                disabled={!selectedStaff}
                 onClick={() =>
                   assignStaffMutation.mutate({
                     issueId: selectedIssue._id,
                     staff: selectedStaff,
                   })
                 }
-                className="px-4 py-2 bg-green-600 text-white rounded"
+                className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
               >
                 Assign
               </button>

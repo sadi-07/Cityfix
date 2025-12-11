@@ -72,6 +72,38 @@ const Dashboard = () => {
             </>
           )}
 
+          {/* Premium Links */}
+          {user?.role === "premium" && (
+            <>
+              <NavLink
+            to="/dashboard/profile"
+            className={({ isActive }) =>
+              `px-4 py-2 rounded-lg ${isActive ? "bg-gray-700" : "hover:bg-gray-800"}`
+            }
+          >
+            My Profile
+          </NavLink>
+
+              <NavLink
+                to="/dashboard/report-issue"
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-lg ${isActive ? "bg-gray-700" : "hover:bg-gray-800"}`
+                }
+              >
+                Report Issue
+              </NavLink>
+
+              <NavLink
+                to="/dashboard/my-issues"
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-lg ${isActive ? "bg-gray-700" : "hover:bg-gray-800"}`
+                }
+              >
+                My Issues
+              </NavLink>
+            </>
+          )}
+
           {/* Staff Links */}
           {user?.role === "staff" && (
             <>

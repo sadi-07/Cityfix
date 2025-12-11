@@ -2,6 +2,8 @@ import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Loading from "../../../Components/Shared/Loading";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const backend = "http://localhost:3000";
 
@@ -30,19 +32,34 @@ const ManageUsers = () => {
     },
   });
 
-  // Confirmation before block/unblock
+
   const handleToggleBlock = (user) => {
-    const confirmMsg = user.blocked
-      ? "Unblock this user?"
-      : "Block this user?";
+  const action = user.blocked ? "Unblock" : "Block";
 
-    if (!window.confirm(confirmMsg)) return;
+  Swal.fire({
+    title: `${action} User?`,
+    text: `Are you sure you want to ${action.toLowerCase()} ${user.name}?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      toggleBlockMutation.mutate(
+        { email: user.email, status: !user.blocked },
+        {
+          onSuccess: () => {
+            toast.success(`User ${action.toLowerCase()}ed successfully!`);
+          },
+          onError: () => {
+            toast.error(`Failed to ${action.toLowerCase()} user`);
+          },
+        }
+      );
+    }
+  });
+};
 
-    toggleBlockMutation.mutate({
-      email: user.email,
-      status: !user.blocked,
-    });
-  };
 
   if (isLoading) return <Loading></Loading>;
 
@@ -97,9 +114,8 @@ const ManageUsers = () => {
 
                 <td className="border p-2">
                   <button
-                    className={`px-3 py-1 rounded text-white ${
-                      user.blocked ? "bg-green-600" : "bg-red-600"
-                    }`}
+                    className={`px-3 py-1 rounded text-white ${user.blocked ? "bg-green-600" : "bg-red-600"
+                      }`}
                     onClick={() => handleToggleBlock(user)}
                   >
                     {user.blocked ? "Unblock" : "Block"}
