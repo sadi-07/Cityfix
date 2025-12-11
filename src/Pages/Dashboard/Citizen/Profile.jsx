@@ -18,6 +18,7 @@ const Profile = () => {
     },
   });
 
+  // Reset form whenever user changes
   useEffect(() => {
     if (user) {
       reset({
@@ -28,7 +29,7 @@ const Profile = () => {
     }
   }, [user, reset]);
 
-  // Update profile
+  // Update profile handler
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -49,10 +50,10 @@ const Profile = () => {
     }
   };
 
-  // Handle subscription (mock)
+  // Handle subscription (skipping actual payment logic)
   const handleSubscribe = async () => {
     try {
-      const res = await fetch(`${backend}/users/${user.email}`, {
+      const res = await fetch(`${backend}/users/subscribe/${user.email}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subscription: { status: "active", plan: "Premium" } }),
@@ -66,50 +67,52 @@ const Profile = () => {
     }
   };
 
+  if (!user) {
+    return <p className="text-center mt-10 text-gray-500">Loading...</p>;
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">My Profile</h1>
 
-      {/* Blocked warning */}
-      {user?.blocked && (
+      {/* BLOCKED WARNING - ALWAYS SHOWN IF BLOCKED */}
+      {user.blocked && (
         <div className="bg-red-100 border border-red-400 text-red-800 p-4 rounded mb-6">
           Your account is blocked. Please contact authorities for assistance.
         </div>
       )}
 
-      {/* Profile card */}
+      {/* Profile Card */}
       <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col md:flex-row items-center gap-6">
         <img
-          src={user?.photoURL || "/default-avatar.png"}
-          alt={user?.name}
+          src={user.photoURL || "/default-avatar.png"}
+          alt={user.name}
           className="w-32 h-32 rounded-full object-cover border-4 border-blue-600"
         />
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-gray-900">{user?.name}</h2>
-            {user?.subscription?.status === "active" && (
+            <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
+            {user.subscription?.status === "active" && (
               <span className="bg-yellow-300 text-yellow-800 text-sm font-semibold px-2 py-1 rounded">
                 Premium
               </span>
             )}
           </div>
-          <p className="text-gray-600">{user?.email}</p>
-          <p className="text-gray-500 mt-2 capitalize">Role: {user?.role}</p>
+          <p className="text-gray-600">{user.email}</p>
+          <p className="text-gray-500 mt-2 capitalize">Role: {user.role}</p>
         </div>
 
-        {/* Buttons */}
         <div className="flex flex-col gap-2">
+          {/* Edit Profile Button */}
           <button
             onClick={() => setShowModal(true)}
-            disabled={user?.blocked} // optional: prevent editing if blocked
-            className={`px-6 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition ${
-              user?.blocked ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className="px-6 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition"
           >
             Edit Profile
           </button>
 
-          {!user?.subscription?.status && !user?.blocked && (
+          {/* Subscribe Button - ONLY if not already premium */}
+          {!user.subscription?.status && !user.blocked && (
             <button
               onClick={handleSubscribe}
               className="px-6 py-2 bg-green-600 text-white font-medium rounded hover:bg-green-700 transition"
@@ -121,7 +124,7 @@ const Profile = () => {
       </div>
 
       {/* Edit Profile Modal */}
-      {showModal && (
+      {showModal && !user.blocked && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <h2 className="text-xl font-bold mb-4">Edit Profile</h2>

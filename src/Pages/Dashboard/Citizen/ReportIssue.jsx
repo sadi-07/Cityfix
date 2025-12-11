@@ -1,146 +1,188 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../Context/AuthProvider";
-import { useNavigate } from "react-router";
-import axios from "axios";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
+import { imageUpload } from "../../../Utils";
 
 const backend = "http://localhost:3000";
 
 const ReportIssue = () => {
   const { user } = useContext(AuthContext);
+  const [issueCount, setIssueCount] = useState(0);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [userIssuesCount, setUserIssuesCount] = useState(0);
 
-  const { register, handleSubmit, reset, watch } = useForm();
+  const { register, handleSubmit, reset } = useForm();
 
-  const image = watch("image"); // to preview if needed
-
-  // Fetch total issues reported by this user
+  // Fetch user's issue count
   useEffect(() => {
-    const fetchUserIssues = async () => {
-      try {
-        const res = await axios.get(`${backend}/issues?email=${user.email}`);
-        setUserIssuesCount(res.data.length);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    if (user?.email) fetchUserIssues();
+    if (user?.email) {
+      fetch(`${backend}/issues/count/${user.email}`)
+        .then((res) => res.json())
+        .then((data) => setIssueCount(data.count));
+    }
   }, [user]);
 
+  const isFreeUser = !user?.subscription?.status;
+  const limitReached = isFreeUser && issueCount >= 3;
+
+  // Submit Handler
   const onSubmit = async (data) => {
-    // Limit check for free users
-    if (user.role !== "premium" && userIssuesCount >= 3) {
-      alert("Free users can only report 3 issues. Please subscribe!");
-      navigate("/dashboard/profile");
-      return;
+    if (limitReached) {
+      return toast.error("Issue limit reached! Please upgrade to Premium.");
     }
 
+    setLoading(true);
+
     try {
-      // Convert image to base64 if uploaded
       let imageURL = "";
-      if (data.image && data.image[0]) {
-        const file = data.image[0];
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        await new Promise((resolve) => {
-          reader.onload = () => {
-            imageURL = reader.result;
-            resolve();
-          };
-        });
+
+      // If user uploaded an image file — upload it to ImgBB
+      if (data.imageFile && data.imageFile.length > 0) {
+        const file = data.imageFile[0];
+        imageURL = await imageUpload(file);
       }
 
-      const issue = {
-        title: data.title,
-        description: data.description,
-        category: data.category,
-        location: data.location,
-        image: imageURL,
-        email: user.email,
-        name: user.name,
-        status: "Pending",
-        priority: "Normal",
-        upvoteCount: 0,
-        upvotedBy: [],
-        timeline: [
-          {
-            status: "Created",
-            message: `Issue created by ${user.email}`,
-            updatedBy: user.email,
-            time: new Date(),
-          },
-        ],
-      };
+      const res = await fetch(`${backend}/issues`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          location: data.location,
+          image: imageURL, // saved URL from ImgBB
+          userEmail: user.email,
+          status: "Pending",
+          timeline: [
+            {
+              message: "Issue created",
+              time: new Date(),
+            },
+          ],
+        }),
+      });
 
-      await axios.post(`${backend}/issues`, issue);
+      const result = await res.json();
 
-      toast.success("Issue created successfully!");
-      reset();
-      navigate("/dashboard/my-issues");
+      if (res.ok) {
+        toast.success("Issue reported successfully!");
+        reset();
+        navigate("/dashboard/my-issues");
+      } else {
+        toast.error(result.message || "Failed to create issue");
+      }
     } catch (err) {
       console.log(err);
-      toast.error("Failed to create issue");
+      toast.error("Something went wrong while submitting");
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Report New Issue</h2>
+  console.log(user.email)
 
-      {/* Free user limit */}
-      {user.role !== "premium" && userIssuesCount >= 3 && (
-        <p className="text-red-500 mb-4">
-          Free users can only report 3 issues. Please subscribe!{" "}
+  return (
+    <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Report an Issue</h1>
+
+      {/* Free User Limit Warning */}
+      {limitReached && (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 p-4 rounded mb-6">
+          You reached your free limit (3 issues).
           <button
-            className="underline text-blue-500"
-            onClick={() => navigate("/dashboard/profile")}
+            onClick={() => navigate("/profile")}
+            className="ml-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
           >
-            Subscribe
+            Upgrade to Premium
           </button>
-        </p>
+        </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-        <input
-          type="text"
-          placeholder="Title"
-          className="p-2 border rounded"
-          {...register("title", { required: true })}
-        />
-        <textarea
-          placeholder="Description"
-          className="p-2 border rounded"
-          {...register("description", { required: true })}
-        />
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white shadow-lg p-6 rounded-lg space-y-4"
+      >
+        {/* Title */}
+        <div>
+          <label className="font-semibold">Issue Title</label>
+          <input
+            type="text"
+            {...register("title", { required: true })}
+            className="w-full border p-2 rounded mt-1"
+            placeholder="Road broken, water problem..."
+            disabled={limitReached}
+            required
+          />
+        </div>
 
-        <select
-          className="p-2 border rounded"
-          {...register("category", { required: true })}
-        >
-          <option value="">Select Category</option>
-          <option value="Road">Road</option>
-          <option value="Garbage">Garbage</option>
-          <option value="Water">Water</option>
-          <option value="Electricity">Electricity</option>
-        </select>
+        {/* Description */}
+        <div>
+          <label className="font-semibold">Description</label>
+          <textarea
+            {...register("description", { required: true })}
+            className="w-full border p-2 rounded mt-1 h-28"
+            placeholder="Describe the issue..."
+            disabled={limitReached}
+            required
+          ></textarea>
+        </div>
 
-        <input
-          type="text"
-          placeholder="Location"
-          className="p-2 border rounded"
-          {...register("location", { required: true })}
-        />
+        {/* Category */}
+        <div>
+          <label className="font-semibold">Category</label>
+          <select
+            {...register("category", { required: true })}
+            className="w-full border p-2 rounded mt-1"
+            disabled={limitReached}
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="Road">Road</option>
+            <option value="Electricity">Electricity</option>
+            <option value="Water Supply">Water Supply</option>
+            <option value="Garbage">Garbage</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
 
-        <input type="file" accept="image/*" {...register("image")} />
+        {/* Image Upload */}
+        <div>
+          <label className="font-semibold">Upload Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            {...register("imageFile")}
+            className="w-full border p-2 rounded mt-1"
+            disabled={limitReached}
+          />
+        </div>
 
+        {/* Location */}
+        <div>
+          <label className="font-semibold">Location</label>
+          <input
+            type="text"
+            {...register("location", { required: true })}
+            className="w-full border p-2 rounded mt-1"
+            placeholder="Your area / street name"
+            disabled={limitReached}
+            required
+          />
+        </div>
+
+        {/* Submit */}
         <button
           type="submit"
-          disabled={user.role !== "premium" && userIssuesCount >= 3}
-          className="bg-green-600 text-white px-4 py-2 rounded mt-2 cursor-pointer"
+          disabled={loading || limitReached}
+          className={`w-full py-3 text-white rounded font-semibold ${
+            limitReached
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
-          Submit Issue
+          {loading ? "Submitting..." : "Submit Issue"}
         </button>
       </form>
     </div>
