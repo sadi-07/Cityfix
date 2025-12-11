@@ -85,7 +85,7 @@ const ReportIssue = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Report an Issue</h1>
+      <h1 className="text-4xl font-bold mb-6">Report an Issue</h1>
 
       {/* Free User Limit Warning */}
       {limitReached && (
@@ -106,7 +106,7 @@ const ReportIssue = () => {
       >
         {/* Title */}
         <div>
-          <label className="font-semibold">Issue Title</label>
+          <label className="font-bold text-lg">Issue Title</label>
           <input
             type="text"
             {...register("title", { required: true })}
@@ -119,7 +119,7 @@ const ReportIssue = () => {
 
         {/* Description */}
         <div>
-          <label className="font-semibold">Description</label>
+          <label className="font-bold text-lg">Description</label>
           <textarea
             {...register("description", { required: true })}
             className="w-full border p-2 rounded mt-1 h-28"
@@ -131,7 +131,7 @@ const ReportIssue = () => {
 
         {/* Category */}
         <div>
-          <label className="font-semibold">Category</label>
+          <label className="font-bold text-lg">Category</label>
           <select
             {...register("category", { required: true })}
             className="w-full border p-2 rounded mt-1"
@@ -149,7 +149,7 @@ const ReportIssue = () => {
 
         {/* Image Upload */}
         <div>
-          <label className="font-semibold">Upload Image</label>
+          <label className="font-bold text-lg">Upload Image</label>
           <input
             type="file"
             accept="image/*"
@@ -161,7 +161,7 @@ const ReportIssue = () => {
 
         {/* Location */}
         <div>
-          <label className="font-semibold">Location</label>
+          <label className="font-bold text-lg">Location</label>
           <input
             type="text"
             {...register("location", { required: true })}
@@ -176,7 +176,7 @@ const ReportIssue = () => {
         <button
           type="submit"
           disabled={loading || limitReached}
-          className={`w-full py-3 text-white rounded font-semibold ${
+          className={`w-full py-3 text-white rounded font-bold cursor-pointer text-xl ${
             limitReached
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700"

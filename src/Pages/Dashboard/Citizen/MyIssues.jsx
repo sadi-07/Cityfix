@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../../Context/AuthProvider";
 import { Link } from "react-router";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const backend = "http://localhost:3000";
 
@@ -137,13 +138,32 @@ const MyIssues = () => {
                   <button
                     className="px-3 py-1 bg-red-600 text-white rounded"
                     onClick={() => {
-                      if (window.confirm("Are you sure to delete this issue?")) {
-                        deleteMutation.mutate(issue._id);
-                      }
+                      Swal.fire({
+                        title: "Are you sure?",
+                        text: "This issue will be permanently deleted!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Yes, delete it!"
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          deleteMutation.mutate(issue._id);
+
+                          Swal.fire({
+                            title: "Deleted!",
+                            text: "The issue has been removed.",
+                            icon: "success",
+                            timer: 1400,
+                            showConfirmButton: false,
+                          });
+                        }
+                      });
                     }}
                   >
                     Delete
                   </button>
+
                   <Link
                     to={`/issues/${issue._id}`}
                     className="px-3 py-1 bg-gray-800 text-white rounded"
@@ -161,7 +181,7 @@ const MyIssues = () => {
       {editIssue && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-96">
-            <h3 className="text-xl font-bold mb-4">Edit Issue</h3>
+            <h3 className="text-3xl font-bold mb-4">Edit Issue</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -176,6 +196,7 @@ const MyIssues = () => {
                 updateMutation.mutate(formData);
               }}
             >
+              <label className="font-bold text-lg">Title</label>
               <input
                 type="text"
                 name="title"
@@ -184,14 +205,19 @@ const MyIssues = () => {
                 className="w-full p-2 border rounded mb-2"
                 required
               />
-              <input
-                type="text"
+              <label className="font-bold text-lg">Category</label>
+              <select
                 name="category"
                 defaultValue={editIssue.category}
-                placeholder="Category"
                 className="w-full p-2 border rounded mb-2"
-                required
-              />
+              >
+                <option value="Road">Road</option>
+                <option value="Garbage">Garbage</option>
+                <option value="Water">Water</option>
+                <option value="Electricity">Electricity</option>
+                <option value="Others">Others</option>
+              </select>
+              <label className="font-bold text-lg">Priority</label>
               <select
                 name="priority"
                 defaultValue={editIssue.priority}
@@ -200,6 +226,7 @@ const MyIssues = () => {
                 <option value="Normal">Normal</option>
                 <option value="High">High</option>
               </select>
+              <label className="font-bold text-lg">Location</label>
               <input
                 type="text"
                 name="location"
@@ -207,6 +234,7 @@ const MyIssues = () => {
                 placeholder="Location"
                 className="w-full p-2 border rounded mb-2"
               />
+              <label className="font-bold text-lg">Description</label>
               <textarea
                 name="description"
                 defaultValue={editIssue.description}

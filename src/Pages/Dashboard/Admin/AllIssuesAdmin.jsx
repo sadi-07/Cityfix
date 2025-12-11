@@ -60,9 +60,11 @@ const AllIssuesAdmin = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["all-issues"]);
-      Swal.fire("Rejected!", "Issue has been rejected", "success");
+      queryClient.invalidateQueries(["my-issues"]); // citizen page also updates
+      Swal.fire("Rejected!", "The issue has been deleted.", "success");
     },
   });
+
 
   if (isLoading) return <Loading />;
 
@@ -103,11 +105,10 @@ const AllIssuesAdmin = () => {
                 <td className="p-2 border">{issue.status}</td>
 
                 <td
-                  className={`p-2 border ${
-                    issue.priority === "high"
-                      ? "text-red-600 font-bold"
-                      : "text-gray-700"
-                  }`}
+                  className={`p-2 border ${issue.priority === "high"
+                    ? "text-red-600 font-bold"
+                    : "text-gray-700"
+                    }`}
                 >
                   {issue.priority}
                 </td>
@@ -136,18 +137,28 @@ const AllIssuesAdmin = () => {
                   )}
 
                   {/* Reject */}
-                  {issue.status === "pending" && (
+                  {issue.status === "Pending" && (
                     <button
                       onClick={() =>
                         Swal.fire({
                           title: "Reject this issue?",
-                          text: "This action cannot be undone.",
+                          text: "This will delete the issue permanently.",
                           icon: "warning",
                           showCancelButton: true,
-                          confirmButtonText: "Yes, reject",
+                          confirmButtonColor: "#d33",
+                          cancelButtonColor: "#3085d6",
+                          confirmButtonText: "Yes, delete it!",
                         }).then((result) => {
                           if (result.isConfirmed) {
                             rejectMutation.mutate(issue._id);
+
+                            Swal.fire({
+                              title: "Deleted!",
+                              text: "The issue has been removed.",
+                              icon: "success",
+                              timer: 1500,
+                              showConfirmButton: false,
+                            });
                           }
                         })
                       }
@@ -155,6 +166,7 @@ const AllIssuesAdmin = () => {
                     >
                       Reject
                     </button>
+
                   )}
                 </td>
               </tr>

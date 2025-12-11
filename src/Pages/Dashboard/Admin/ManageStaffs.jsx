@@ -3,6 +3,8 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../Firebase/firebase.config";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 const backend = "http://localhost:3000";
 
@@ -17,8 +19,9 @@ const ManageStaff = () => {
   const { data: staff = [], isLoading } = useQuery({
     queryKey: ["staff"],
     queryFn: async () => {
-      const res = await axios.get(`${backend}/users`);
-      return res.data.filter((u) => u.role === "staff");
+      const res = await axios.get(`${backend}/users?role=staff`);
+      return res.data;
+
     },
   });
 
@@ -31,6 +34,8 @@ const ManageStaff = () => {
         staffData.email,
         staffData.password
       );
+
+      await auth.signOut();  
 
       const finalData = {
         name: staffData.name,
@@ -48,20 +53,21 @@ const ManageStaff = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["staff"]);
       setShowAddModal(false);
-      alert("Staff added successfully!");
+      toast.success("Staff added successfully!");
     },
   });
 
   // UPDATE Staff Mutation
   const updateStaffMutation = useMutation({
     mutationFn: async ({ email, updateData }) => {
-      const res = await axios.patch(`${backend}/staff/${email}`, updateData);
+      const res = await axios.patch(`${backend}/users/update/${email}`, updateData);
+
       return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["staff"]);
       setShowEditModal(false);
-      alert("Staff updated!");
+      toast.success("Staff updated!");
     },
   });
 
@@ -84,11 +90,22 @@ const ManageStaff = () => {
   };
 
   // Delete confirmation
+
   const handleDelete = (email) => {
-    if (window.confirm("Are you sure? Delete this staff?")) {
-      deleteStaffMutation.mutate(email);
-    }
+    Swal.fire({
+      title: "Delete this staff?",
+      text: "This action can’t be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteStaffMutation.mutate(email);
+      }
+    });
   };
+
 
   // Handle Add staff form submit
   const handleAddSubmit = (e) => {
@@ -200,12 +217,16 @@ const ManageStaff = () => {
             className="bg-white p-6 rounded w-96 space-y-3"
           >
             <h2 className="text-xl font-bold mb-3">Add Staff</h2>
-
-            <input type="text" name="name" placeholder="Name" className="w-full p-2 border rounded" required />
-            <input type="email" name="email" placeholder="Email" className="w-full p-2 border rounded" required />
-            <input type="text" name="phone" placeholder="Phone" className="w-full p-2 border rounded" required />
-            <input type="text" name="photoURL" placeholder="Photo URL" className="w-full p-2 border rounded" required />
-            <input type="password" name="password" placeholder="Password" className="w-full p-2 border rounded" required />
+            <label className="font-bold text-lg">Name</label>
+            <input type="text" name="name" placeholder="Name" className="w-full mt-1 p-2 border rounded" required />
+            <label className="font-bold text-lg">Email</label>
+            <input type="email" name="email" placeholder="Email" className="w-full mt-1 p-2 border rounded" required />
+            <label className="font-bold text-lg">Phone</label>
+            <input type="text" name="phone" placeholder="Phone" className="w-full mt-1 p-2 border rounded" required />
+            <label className="font-bold text-lg">Photo</label>
+            <input type="text" name="photoURL" placeholder="Photo URL" className="w-full mt-1 p-2 border rounded" required />
+            <label className="font-bold text-lg">Password</label>
+            <input type="password" name="password" placeholder="Password" className="w-full mt-1 p-2 border rounded" required />
 
             <div className="flex justify-between mt-3">
               <button type="button" className="px-4 py-2 bg-gray-400 text-white rounded" onClick={() => setShowAddModal(false)}>Cancel</button>
@@ -224,8 +245,11 @@ const ManageStaff = () => {
           >
             <h2 className="text-xl font-bold mb-3">Update Staff</h2>
 
+            <label className="font-bold text-lg">Name</label>
             <input type="text" name="name" defaultValue={editStaff.name} className="w-full p-2 border rounded" required />
+            <label className="font-bold text-lg">Phone</label>
             <input type="text" name="phone" defaultValue={editStaff.phone} className="w-full p-2 border rounded" required />
+            <label className="font-bold text-lg">Photo</label>
             <input type="text" name="photoURL" defaultValue={editStaff.photoURL} className="w-full p-2 border rounded" required />
 
             <div className="flex justify-between mt-3">
