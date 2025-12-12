@@ -90,11 +90,11 @@ const StaffProfile = () => {
               </div>
 
               <div>
-                <label className="block font-medium mb-1">Email (readonly)</label>
+                <label className="block font-medium mb-1">Email</label>
                 <input
                   type="email"
                   {...register("email")}
-                  className="w-full border p-2 rounded bg-gray-100"
+                  className="w-full border p-2 rounded bg-gray-100 cursor-not-allowed"
                   readOnly
                 />
               </div>

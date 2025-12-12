@@ -41,20 +41,26 @@ const AdminDashboard = () => {
     },
   });
 
+  console.log(stats.resolvedIssues)
+  console.log(stats.rejectedIssues)
+
   return (
     <div className="p-6 space-y-10">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
       {/* ====================== STATS CARDS ====================== */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card title="Total Issues" value={stats.totalIssues} />
-        <Card title="Pending Issues" value={stats.pendingIssues} />
-        <Card title="Resolved Issues" value={stats.resolvedIssues} />
-        <Card title="Rejected Issues" value={stats.rejectedIssues} />
-        <Card title="Boosted Issues" value={stats.boostedIssues} />
-        <Card title="Total Users" value={stats.totalUsers} />
-        <Card title="Total Payments (৳)" value={stats.totalPayments} />
+
+        <Card title="Total Issues" value={stats.totalIssues} color="bg-blue-700" />
+        <Card title="Pending Issues" value={stats.pendingIssues} color="bg-yellow-700" />
+        <Card title="Resolved Issues" value={stats.resolvedIssues} color="bg-green-700" />
+        <Card title="Rejected Issues" value={stats.rejectedIssues} color="bg-red-700" />
+        <Card title="Boosted Issues" value={stats.boostedIssues} color="bg-purple-700" />
+        <Card title="Total Users" value={stats.totalUsers} color="bg-indigo-700" />
+        <Card title="Total Payments (৳)" value={stats.totalPayments} color="bg-emerald-700" />
+
       </div>
+
 
       {/* Latest Issues */}
       <Section title="Latest Issues" data={latestIssues} fields={["title", "status", "priority"]} />
@@ -69,12 +75,13 @@ const AdminDashboard = () => {
 };
 
 // ======================= CARD COMPONENT =======================
-const Card = ({ title, value }) => (
-  <div className="p-6 bg-white shadow rounded">
-    <h3 className="text-gray-600">{title}</h3>
+const Card = ({ title, value, color }) => (
+  <div className={`p-6 text-white shadow rounded ${color}`}>
+    <h3 className="opacity-80">{title}</h3>
     <p className="text-3xl font-bold">{value ?? 0}</p>
   </div>
 );
+
 
 // ======================= TABLE SECTION =======================
 const Section = ({ title, data, fields }) => (

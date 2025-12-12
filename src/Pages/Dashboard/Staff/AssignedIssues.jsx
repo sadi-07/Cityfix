@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../../Context/AuthProvider";
 import axios from "axios";
+import { Link } from "react-router";
 
 const backend = "http://localhost:3000";
 
@@ -45,8 +46,8 @@ const AssignedIssues = () => {
       a.priority === "High" && b.priority !== "High"
         ? -1
         : b.priority === "High" && a.priority !== "High"
-        ? 1
-        : 0
+          ? 1
+          : 0
     );
 
     setFilteredIssues(data);
@@ -122,40 +123,43 @@ const AssignedIssues = () => {
               <td className="border px-4 py-2 font-semibold">{issue.status}</td>
               <td className="border px-4 py-2">{issue.priority}</td>
 
-              <td className="border px-4 py-2 relative">
-  {/* Toggle Button */}
-  <button
-    className={`px-3 py-1 rounded text-white ${
-      issue.status === "Closed"
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-blue-600"
-    }`}
-    disabled={issue.status === "Closed"}
-    onClick={() =>
-      issue.status !== "Closed" &&
-      setOpenDropdown(openDropdown === issue._id ? null : issue._id)
-    }
-  >
-    Change Status
-  </button>
+              <td className="border px-4 py-2 relative flex items-center justify-around">
+                {/* Toggle Button */}
+                <button
+                  className={`px-3 py-1 rounded text-white ${issue.status === "Closed"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600"
+                    }`}
+                  disabled={issue.status === "Closed"}
+                  onClick={() =>
+                    issue.status !== "Closed" &&
+                    setOpenDropdown(openDropdown === issue._id ? null : issue._id)
+                  }
+                >
+                  Change Status
+                </button>
 
-  {/* Dropdown */}
-  {openDropdown === issue._id &&
-    issue.status !== "Closed" && // prevents dropdown when closed
-    statusFlow[issue.status]?.length > 0 && (
-      <div className="absolute mt-2 bg-white shadow-lg border rounded p-2 z-10">
-        {statusFlow[issue.status].map((next) => (
-          <button
-            key={next}
-            className="block w-full text-left px-3 py-1 hover:bg-gray-100"
-            onClick={() => handleStatusChange(issue._id, next)}
-          >
-            {next}
-          </button>
-        ))}
-      </div>
-    )}
-</td>
+                {/* Dropdown */}
+                {openDropdown === issue._id &&
+                  issue.status !== "Closed" && // prevents dropdown when closed
+                  statusFlow[issue.status]?.length > 0 && (
+                    <div className="absolute mt-2 bg-white shadow-lg border rounded p-2 z-10">
+                      {statusFlow[issue.status].map((next) => (
+                        <button
+                          key={next}
+                          className="block w-full text-left px-3 py-1 hover:bg-gray-100"
+                          onClick={() => handleStatusChange(issue._id, next)}
+                        >
+                          {next}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <Link to={`/issues/${issue._id}`}>
+                    <button className="px-3 py-1 rounded text-white bg-gray-800">View Details</button>
+                  </Link>
+              </td>
 
             </tr>
           ))}
