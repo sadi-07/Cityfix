@@ -22,7 +22,7 @@ const StaffDashboard = () => {
 
   // Stats
   const assignedCount = issues.length;
-  const resolvedCount = issues.filter(i => i.status === "Resolved").length;
+  const resolvedCount = issues.filter(i => i.status === "Closed").length;
   const todayTasks = issues.filter(i => {
     const date = new Date(i.assignedDate).toDateString();
     return date === new Date().toDateString();

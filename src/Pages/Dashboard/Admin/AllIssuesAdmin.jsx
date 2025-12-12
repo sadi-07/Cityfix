@@ -31,14 +31,15 @@ const AllIssuesAdmin = () => {
   });
 
   // ⭐ Assign Staff Mutation
+  // ⭐ Assign Staff Mutation (Final Working)
   const assignStaffMutation = useMutation({
-    mutationFn: async ({ issueId, staff }) => {
+    mutationFn: async ({ issueId, staffId }) => {
       const res = await fetch(
-        `http://localhost:3000/issues/assign-staff/${issueId}`,
+        `http://localhost:3000/issues/assign/${issueId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ staff }),
+          body: JSON.stringify({ staffId }),
         }
       );
       return res.json();
@@ -49,6 +50,7 @@ const AllIssuesAdmin = () => {
       Swal.fire("Success!", "Staff assigned successfully", "success");
     },
   });
+
 
   // ⭐ Reject issue Mutation
   const rejectMutation = useMutation({
@@ -124,50 +126,61 @@ const AllIssuesAdmin = () => {
                 <td className="p-2 border flex gap-2">
 
                   {/* Assign Staff */}
-                  {!issue.assignedStaff && issue.status !== "rejected" && (
-                    <button
-                      onClick={() => {
-                        setSelectedIssue(issue);
-                        setShowModal(true);
-                      }}
-                      className="px-3 py-1 bg-blue-600 text-white rounded"
-                    >
-                      Assign
-                    </button>
-                  )}
+                  <button
+                    onClick={() => {
+                      if (issue.assignedStaff || issue.status === "Rejected") return;
+
+                      setSelectedIssue(issue);
+                      setShowModal(true);
+                    }}
+                    disabled={issue.assignedStaff || issue.status === "Rejected"}
+                    className={`px-3 py-1 rounded text-white
+    ${issue.assignedStaff || issue.status === "Rejected"
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                      }`}
+                  >
+                    Assign
+                  </button>
+
 
                   {/* Reject */}
-                  {issue.status === "Pending" && (
-                    <button
-                      onClick={() =>
-                        Swal.fire({
-                          title: "Reject this issue?",
-                          text: "This will delete the issue permanently.",
-                          icon: "warning",
-                          showCancelButton: true,
-                          confirmButtonColor: "#d33",
-                          cancelButtonColor: "#3085d6",
-                          confirmButtonText: "Yes, delete it!",
-                        }).then((result) => {
-                          if (result.isConfirmed) {
-                            rejectMutation.mutate(issue._id);
+                  <button
+                    onClick={() => {
+                      if (issue.assignedStaff || issue.status === "Rejected") return;
 
-                            Swal.fire({
-                              title: "Deleted!",
-                              text: "The issue has been removed.",
-                              icon: "success",
-                              timer: 1500,
-                              showConfirmButton: false,
-                            });
-                          }
-                        })
-                      }
-                      className="px-3 py-1 bg-red-600 text-white rounded"
-                    >
-                      Reject
-                    </button>
+                      Swal.fire({
+                        title: "Reject this issue?",
+                        text: "This will delete the issue permanently.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Yes, delete it!",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          rejectMutation.mutate(issue._id);
 
-                  )}
+                          Swal.fire({
+                            title: "Deleted!",
+                            text: "The issue has been removed.",
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false,
+                          });
+                        }
+                      });
+                    }}
+                    disabled={issue.assignedStaff || issue.status === "Rejected"}
+                    className={`px-3 py-1 rounded text-white
+    ${issue.assignedStaff || issue.status === "Rejected"
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-red-600 hover:bg-red-700"
+                      }`}
+                  >
+                    Reject
+                  </button>
+
                 </td>
               </tr>
             ))}
@@ -209,7 +222,7 @@ const AllIssuesAdmin = () => {
                 onClick={() =>
                   assignStaffMutation.mutate({
                     issueId: selectedIssue._id,
-                    staff: selectedStaff,
+                    staffId: selectedStaff,
                   })
                 }
                 className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
@@ -219,8 +232,9 @@ const AllIssuesAdmin = () => {
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 

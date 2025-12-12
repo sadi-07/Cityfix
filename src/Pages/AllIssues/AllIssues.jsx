@@ -12,16 +12,15 @@ const AllIssues = () => {
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const backend = "http://localhost:3000";
-
-  // 🔥 TQuery Setup
   const queryClient = useQueryClient();
 
-  // 🔥 Fetch All Issues (Mandatory TanStack Query)
+  // 🔥 Fetch all issues
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["issues"],
     queryFn: async () => {
@@ -30,29 +29,44 @@ const AllIssues = () => {
     },
   });
 
-  // 🔥 FILTER + SEARCH
+  // 🔥 Debounce search input
   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // 🔥 FILTER + SORT
+  useEffect(() => {
+    if (!issues) return;
+
     let data = [...issues];
 
     if (category) data = data.filter((i) => i.category === category);
     if (status) data = data.filter((i) => i.status === status);
     if (priority) data = data.filter((i) => i.priority === priority);
 
-    if (search.trim()) {
+    if (debouncedSearch.trim()) {
       data = data.filter((i) =>
-        i.title.toLowerCase().includes(search.toLowerCase())
+        i.title.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
 
     // Sort: boosted/upvoted issues first
-    data.sort(
-      (a, b) => (b.upvoteCount || 0) - (a.upvoteCount || 0)
-    );
+    data.sort((a, b) => (b.upvoteCount || 0) - (a.upvoteCount || 0));
 
-    setFilteredIssues(data);
-  }, [category, status, priority, search, issues]);
+    // Only set state if array changed
+    setFilteredIssues((prev) => {
+      const prevIds = prev.map((i) => i._id).join(",");
+      const newIds = data.map((i) => i._id).join(",");
+      if (prevIds !== newIds) return data;
+      return prev;
+    });
+  }, [category, status, priority, debouncedSearch, issues]);
 
-  // Upvote Mutation (TANSTACK QUERY)
+  // 🔥 Upvote Mutation
   const upvoteMutation = useMutation({
     mutationFn: async (issue) => {
       if (!user) return navigate("/login");
@@ -61,14 +75,11 @@ const AllIssues = () => {
         userEmail: user.email,
       });
     },
-
-    // After success → re-fetch issues
     onSuccess: () => {
       queryClient.invalidateQueries(["issues"]);
     },
   });
 
-  // 🔥 Handle Upvote
   const handleUpvote = (issue) => {
     if (!user) return navigate("/login");
 
@@ -81,14 +92,17 @@ const AllIssues = () => {
     upvoteMutation.mutate(issue);
   };
 
+  if (isLoading) return <p>Loading...</p>;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold mb-6">All Issues</h1>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-4 mb-6 flex-wrap">
         <select
           className="p-2 border rounded"
+          value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
           <option value="">Category</option>
@@ -100,6 +114,7 @@ const AllIssues = () => {
 
         <select
           className="p-2 border rounded"
+          value={status}
           onChange={(e) => setStatus(e.target.value)}
         >
           <option value="">Status</option>
@@ -110,6 +125,7 @@ const AllIssues = () => {
 
         <select
           className="p-2 border rounded"
+          value={priority}
           onChange={(e) => setPriority(e.target.value)}
         >
           <option value="">Priority</option>
@@ -120,7 +136,8 @@ const AllIssues = () => {
         <input
           type="text"
           placeholder="Search issue..."
-          className="p-2 border rounded flex-1"
+          className="p-2 border rounded flex-1 min-w-[200px]"
+          value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
@@ -129,16 +146,18 @@ const AllIssues = () => {
       <div className="grid md:grid-cols-3 gap-6">
         {filteredIssues.map((issue) => (
           <div key={issue._id} className="shadow-lg border rounded p-4">
-            <img
-              src={issue.image}
-              alt={issue.title}
-              className="h-40 w-full object-cover rounded mb-3"
-            />
+            {issue.image && (
+              <img
+                src={issue.image}
+                alt={issue.title}
+                className="h-40 w-full object-cover rounded mb-3"
+              />
+            )}
 
             <h2 className="text-xl font-bold">{issue.title}</h2>
             <p className="text-gray-600">{issue.location}</p>
 
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-2 mt-2 flex-wrap">
               <span className="px-2 py-1 text-xs bg-gray-200 rounded">
                 {issue.category}
               </span>
@@ -156,7 +175,7 @@ const AllIssues = () => {
               </span>
             </div>
 
-            <div className="mt-4 flex justify-between items-center">
+            <div className="mt-4 flex justify-between items-center flex-wrap gap-2">
               <button
                 onClick={() => handleUpvote(issue)}
                 className="px-3 py-1 bg-green-600 text-white rounded"
