@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../../Context/AuthProvider";
 import axios from "axios";
 import { Link } from "react-router";
+import toast from "react-hot-toast";
 
 const backend = "http://localhost:3000";
 
@@ -69,7 +70,7 @@ const AssignedIssues = () => {
       setOpenDropdown(null);
     } catch (err) {
       console.error(err);
-      alert("Failed to update status");
+      toast.error("Failed to update status");
     }
   };
 

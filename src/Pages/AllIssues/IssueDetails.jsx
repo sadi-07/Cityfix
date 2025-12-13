@@ -120,7 +120,7 @@ const IssueDetails = () => {
         {/* UPVOTE */}
         <button
           onClick={handleUpvote}
-          className="px-4 py-2 bg-green-600 text-white rounded"
+          className="px-4 py-2 bg-green-600 text-white rounded cursor-pointer"
         >
           👍 Upvote {issue.upvoteCount || 0}
         </button>
@@ -169,25 +169,25 @@ const IssueDetails = () => {
       <div className="mt-10">
         <h2 className="text-2xl font-bold mb-4">Issue Timeline</h2>
 
-        <div className="border-l-4 border-gray-400 pl-6 space-y-6">
+        <div className="border-l-4 border-green-400 pl-6 space-y-6">
           {issue.timeline
             .slice()
             .reverse()
             .map((t, i) => (
               <div key={i} className="relative">
-                <div className="absolute -left-3 top-1 w-4 h-4 bg-gray-500 rounded-full"></div>
+                <div className="absolute -left-3 top-1 w-4 h-4 bg-green-500 rounded-full mr-4"></div>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 ml-3">
                   {new Date(t.time).toLocaleString()}
                 </p>
 
-                <p className="font-bold">
+                <p className="font-bold ml-3">
                   {t.status}
                 </p>
 
-                <p className="text-gray-700">{t.message}</p>
+                <p className="text-gray-700 ml-3">{t.message}</p>
 
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 ml-3">
                   Updated by: <strong>{t.updatedBy}</strong>
                 </p>
               </div>

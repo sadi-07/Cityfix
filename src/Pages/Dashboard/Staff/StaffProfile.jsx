@@ -48,6 +48,7 @@ const StaffProfile = () => {
     }
   };
 
+  console.log(user)
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">Staff Profile</h1>
@@ -55,7 +56,7 @@ const StaffProfile = () => {
       {/* Profile Card */}
       <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col md:flex-row items-center gap-6">
         <img
-          src={user?.photoURL || "/default-avatar.png"}
+          src={user?.photoURL || "https://i.ibb.co.com/JFSJBVwM/user.png"}
           alt={user?.name}
           className="w-32 h-32 rounded-full object-cover border-4 border-blue-600"
         />

@@ -112,7 +112,7 @@ console.log(user)
                         <Menu as="div" className="relative">
                             <Menu.Button className="rounded-full w-12 h-12 overflow-hidden border border-primary cursor-pointer">
                                 <img
-                                    src={user?.photoURL || "/default-user.png"}
+                                    src={user?.photoURL || "https://i.ibb.co.com/JFSJBVwM/user.png"}
                                     alt={user?.displayName || "User"}
                                     referrerPolicy="no-referrer"
                                     className="w-full h-full object-cover"
@@ -131,7 +131,7 @@ console.log(user)
                                 <Menu.Items className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                                     <div className="px-4 py-3">
                                         <p className="text-xl font-semibold text-primary">
-                                            <span className="text-base text-gray-300">Hello,</span> {user?.displayName}
+                                            <span className="text-base text-gray-300">Hello,</span> {user.displayName || "User" }
                                         </p>
                                     </div>
                                     <div className="px-1 py-2">{privateLinks}</div>

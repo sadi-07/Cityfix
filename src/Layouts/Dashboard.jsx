@@ -195,12 +195,12 @@ const Dashboard = () => {
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full overflow-hidden">
               <img
-                src={user?.photoURL || "/default-avatar.png"}
+                src={user?.photoURL || "https://i.ibb.co.com/JFSJBVwM/user.png"}
                 alt={user?.name || "User"}
                 className="h-full w-full object-cover"
               />
             </div>
-            <p className="font-medium text-gray-700">{user?.name || "User"}</p>
+            <p className="font-semibold text-xl text-gray-800">{user?.name || "User"}</p>
           </div>
         </header>
 

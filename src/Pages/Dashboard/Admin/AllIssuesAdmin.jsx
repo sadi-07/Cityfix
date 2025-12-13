@@ -83,7 +83,7 @@ const AllIssuesAdmin = () => {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold mb-5">All Issues (Admin)</h2>
+      <h2 className="text-3xl font-bold mb-5">All Issues</h2>
 
       {/* Table */}
       <div className="overflow-x-auto mt-6">

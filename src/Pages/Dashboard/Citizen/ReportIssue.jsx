@@ -92,7 +92,7 @@ const ReportIssue = () => {
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 p-4 rounded mb-6">
           You reached your free limit (3 issues).
           <button
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate("/dashboard/profile")}
             className="ml-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
           >
             Upgrade to Premium

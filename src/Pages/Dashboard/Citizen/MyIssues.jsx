@@ -136,8 +136,21 @@ const MyIssues = () => {
                     </button>
                   )}
                   <button
-                    className="px-3 py-1 bg-red-600 text-white rounded"
+                    disabled={issue.status !== "Pending"}
+                    className={`px-3 py-1 rounded text-white
+    ${issue.status === "Pending"
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-gray-400 cursor-not-allowed"
+                      }`}
                     onClick={() => {
+                      if (issue.status !== "Pending") {
+                        return Swal.fire({
+                          icon: "error",
+                          title: "Cannot Delete",
+                          text: "You can only delete issues that are in Pending status.",
+                        });
+                      }
+
                       Swal.fire({
                         title: "Are you sure?",
                         text: "This issue will be permanently deleted!",
@@ -163,6 +176,7 @@ const MyIssues = () => {
                   >
                     Delete
                   </button>
+
 
                   <Link
                     to={`/issues/${issue._id}`}

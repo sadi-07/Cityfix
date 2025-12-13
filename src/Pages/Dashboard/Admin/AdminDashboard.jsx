@@ -41,8 +41,12 @@ const AdminDashboard = () => {
     },
   });
 
-  console.log(stats.resolvedIssues)
-  console.log(stats.rejectedIssues)
+  console.log(stats)
+  console.log(stats.pendingIssues)
+  console.log(stats.totalIssues)
+  console.log(stats.boostedIssues) ///
+  console.log(stats.totalUsers)
+  console.log(stats.totalPayments)
 
   return (
     <div className="p-6 space-y-10">
@@ -53,8 +57,8 @@ const AdminDashboard = () => {
 
         <Card title="Total Issues" value={stats.totalIssues} color="bg-blue-700" />
         <Card title="Pending Issues" value={stats.pendingIssues} color="bg-yellow-700" />
-        <Card title="Resolved Issues" value={stats.resolvedIssues} color="bg-green-700" />
-        <Card title="Rejected Issues" value={stats.rejectedIssues} color="bg-red-700" />
+        <Card title="Resolved Issues" value={stats.closed} color="bg-green-700" />
+        {/* <Card title="Rejected Issues" value={stats.rejectedIssues} color="bg-red-700" /> */}
         <Card title="Boosted Issues" value={stats.boostedIssues} color="bg-purple-700" />
         <Card title="Total Users" value={stats.totalUsers} color="bg-indigo-700" />
         <Card title="Total Payments (৳)" value={stats.totalPayments} color="bg-emerald-700" />
@@ -76,9 +80,9 @@ const AdminDashboard = () => {
 
 // ======================= CARD COMPONENT =======================
 const Card = ({ title, value, color }) => (
-  <div className={`p-6 text-white shadow rounded ${color}`}>
-    <h3 className="opacity-80">{title}</h3>
-    <p className="text-3xl font-bold">{value ?? 0}</p>
+  <div className={`px-6 py-10 text-white shadow rounded ${color}`}>
+    <h3 className="opacity-80 text-xl mb-2 font-semibold">{title}</h3>
+    <p className="text-4xl font-bold">{value ?? 0}</p>
   </div>
 );
 
