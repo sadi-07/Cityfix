@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../Context/AuthProvider";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { imageUpload } from "../../../Utils";
 
 const backend = "http://localhost:3000";
 
@@ -14,8 +15,8 @@ const Profile = () => {
     defaultValues: {
       name: "",
       email: "",
-      photoURL: "",
     },
+
   });
 
   // Reset form whenever user changes
@@ -24,8 +25,8 @@ const Profile = () => {
       reset({
         name: user.name || "",
         email: user.email || "",
-        photoURL: user.photoURL || "",
       });
+
     }
   }, [user, reset]);
 
@@ -33,11 +34,24 @@ const Profile = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
+      let photoURL = user.photoURL;
+
+      // upload image if selected
+      if (data.image && data.image[0]) {
+        photoURL = await imageUpload(data.image[0]);
+      }
+
+      const payload = {
+        name: data.name,
+        photoURL,
+      };
+
       const res = await fetch(`${backend}/users/update/${user.email}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
+
       const updated = await res.json();
       setUser((prev) => ({ ...prev, ...updated }));
       toast.success("Profile updated successfully");
@@ -49,6 +63,7 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
 
   // Handle subscription (skipping actual payment logic)
   const handleSubscribe = async () => {
@@ -150,13 +165,15 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block font-medium mb-1">Photo URL</label>
+                <label className="block font-medium mb-1">Profile Photo</label>
                 <input
-                  type="text"
-                  {...register("photoURL")}
+                  type="file"
+                  accept="image/*"
+                  {...register("image")}
                   className="w-full border p-2 rounded"
                 />
               </div>
+
 
               <div className="flex justify-end gap-3 mt-4">
                 <button

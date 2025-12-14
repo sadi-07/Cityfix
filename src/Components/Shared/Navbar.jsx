@@ -131,7 +131,7 @@ console.log(user)
                                 <Menu.Items className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                                     <div className="px-4 py-3">
                                         <p className="text-xl font-semibold text-primary">
-                                            <span className="text-base text-gray-300">Hello,</span> {user.displayName || "User" }
+                                            <span className="text-base text-gray-300">Hello,</span> {user.displayName || user.role }
                                         </p>
                                     </div>
                                     <div className="px-1 py-2">{privateLinks}</div>
