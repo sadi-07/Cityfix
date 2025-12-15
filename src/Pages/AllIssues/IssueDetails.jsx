@@ -1,10 +1,12 @@
-import React, { useContext } from "react";
-import { useParams, useNavigate, Link } from "react-router";
+import React, { useContext, useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import { AuthContext } from "../../Context/AuthProvider";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Loading from "../../Components/Shared/Loading";
+import Swal from "sweetalert2";
+import { imageUpload } from "../../Utils";
 
 const backend = "http://localhost:3000";
 
@@ -14,22 +16,26 @@ const IssueDetails = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // FETCH SINGLE ISSUE ------------------------------------------
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+
+  // FETCH ISSUE
   const { data: issue, isLoading } = useQuery({
     queryKey: ["issue", id],
     queryFn: async () => {
       const res = await axios.get(`${backend}/issues/${id}`);
       return res.data;
     },
+    enabled: !!id,
   });
 
-  // UPVOTE --------------------------------------------------------
+  // UPVOTE
   const upvoteMutation = useMutation({
     mutationFn: async () =>
       axios.patch(`${backend}/issues/upvote/${id}`, {
         userEmail: user?.email,
       }),
-
     onSuccess: () => {
       queryClient.invalidateQueries(["issue", id]);
       queryClient.invalidateQueries(["issues"]);
@@ -38,17 +44,14 @@ const IssueDetails = () => {
 
   const handleUpvote = () => {
     if (!user) return navigate("/login");
-
     if (issue.email === user.email)
       return toast.error("You cannot upvote your own issue!");
-
     if (issue.upvotedBy?.includes(user.email))
       return toast.error("You already upvoted!");
-
     upvoteMutation.mutate();
   };
 
-  // DELETE --------------------------------------------------------
+  // DELETE
   const deleteMutation = useMutation({
     mutationFn: async () => axios.delete(`${backend}/issues/${id}`),
     onSuccess: () => {
@@ -58,12 +61,19 @@ const IssueDetails = () => {
   });
 
   const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this issue?")) {
-      deleteMutation.mutate();
-    }
+    Swal.fire({
+      title: "Delete this issue?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it",
+    }).then((res) => {
+      if (res.isConfirmed) deleteMutation.mutate();
+    });
   };
 
-  // BOOST PRIORITY ------------------------------------------------
+  // BOOST
   const boostMutation = useMutation({
     mutationFn: async () =>
       axios.patch(`${backend}/issues/boost/${id}`, {
@@ -78,74 +88,96 @@ const IssueDetails = () => {
 
   const handleBoost = () => {
     if (issue.priority === "High") return;
-
-    // Payment popup example (replace later with real payment)
-    const ok = confirm("Boost issue for 100 BDT ?");
-    if (ok) boostMutation.mutate();
+    if (confirm("Boost issue for 100 BDT ?")) boostMutation.mutate();
   };
 
-  if (isLoading) return <Loading></Loading>;
-  if (!issue) return <p className="my-20 text-4xl text-center font-extrabold">Issue not found.</p>;
+  // EDIT
+  const editMutation = useMutation({
+    mutationFn: async (data) =>
+      axios.patch(`${backend}/issues/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["issue", id]);
+      queryClient.invalidateQueries(["issues"]);
+      toast.success("Issue updated successfully!");
+      setShowEditModal(false);
+    },
+  });
+
+  const handleEditSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    editMutation.mutate({
+      title: form.title.value,
+      category: form.category.value,
+      location: form.location.value,
+      description: form.description.value,
+      image: imageUrl || issue.image,
+    });
+  };
+
+  const handleImageUpload = async (file) => {
+    try {
+      setUploading(true);
+      const url = await imageUpload(file);
+      setImageUrl(url);
+      toast.success("Image uploaded");
+    } catch {
+      toast.error("Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       <h1 className="text-4xl font-bold mb-4">{issue.title}</h1>
 
-      <img
-        src={issue.image}
-        className="w-full h-80 object-cover rounded-lg mb-6"
-      />
+      <img src={issue.image} className="w-full h-80 object-cover rounded mb-6" />
 
-      {/* BASIC INFO */}
       <div className="space-y-2 text-lg">
         <p><strong>Category:</strong> {issue.category}</p>
         <p><strong>Location:</strong> {issue.location}</p>
         <p><strong>Status:</strong> {issue.status}</p>
-        <p>
-          <strong>Priority:</strong>{" "}
-          <span
-            className={`px-2 py-1 rounded ${
-              issue.priority === "High" ? "bg-red-200" : "bg-blue-200"
-            }`}
-          >
-            {issue.priority}
-          </span>
-        </p>
         <p><strong>Description:</strong> {issue.description}</p>
       </div>
 
-      {/* BUTTONS ------------------------------------------------ */}
       <div className="flex gap-4 mt-6">
-
-        {/* UPVOTE */}
         <button
           onClick={handleUpvote}
-          className="px-4 py-2 bg-green-600 text-white rounded cursor-pointer"
+          className="px-4 py-2 bg-green-600 text-white rounded"
         >
           👍 Upvote {issue.upvoteCount || 0}
         </button>
 
-        {/* EDIT (only owner + Pending) */}
-        {user?.email === issue.email && issue.status === "Pending" && (
-          <Link
-            to={`/issues/edit/${issue._id}`}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            Edit
-          </Link>
-        )}
+        <button
+          disabled={issue.status !== "Pending"}
+          onClick={() => setShowEditModal(true)}
+          className={`px-4 py-2 text-white rounded ${
+            issue.status !== "Pending"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600"
+          }`}
+        >
+          Edit
+        </button>
 
-        {/* DELETE (only owner) */}
         {user?.email === issue.email && (
           <button
+            disabled={issue.status !== "Pending"}
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded"
+            className={`px-4 py-2 text-white rounded ${
+            issue.status !== "Pending"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-red-600"
+          }`}
           >
             Delete
           </button>
         )}
 
-        {/* BOOST PRIORITY */}
         {user?.email === issue.email && issue.priority !== "High" && (
           <button
             onClick={handleBoost}
@@ -156,44 +188,80 @@ const IssueDetails = () => {
         )}
       </div>
 
-      {/* STAFF INFO ------------------------------------------- */}
-      {issue.assignedStaff && (
-        <div className="mt-8 p-4 border rounded">
-          <h2 className="text-xl font-bold mb-2">Assigned Staff</h2>
-          <p><strong>Name:</strong> {issue.assignedStaff.name}</p>
-          <p><strong>Email:</strong> {issue.assignedStaff.email}</p>
+      {/* EDIT MODAL */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <form
+            onSubmit={handleEditSubmit}
+            className="bg-white p-6 rounded w-full max-w-lg space-y-3"
+          >
+            <h2 className="text-2xl font-bold">Edit Issue</h2>
+
+            <label className="font-medium">Title</label>
+            <input
+              name="title"
+              defaultValue={issue.title}
+              className="w-full p-2 border rounded"
+              required
+            />
+
+            <label className="font-medium">Photo</label>
+            <input
+              type="file"
+              onChange={(e) => handleImageUpload(e.target.files[0])}
+              className="w-full p-2 border rounded"
+            />
+
+            <label className="font-medium">Category</label>
+            <select
+              name="category"
+              defaultValue={issue.category}
+              className="w-full p-2 border rounded"
+              required
+            >
+              <option value="Road">Road</option>
+              <option value="Electricity">Electricity</option>
+              <option value="Water">Water</option>
+              <option value="Garbage">Garbage</option>
+              <option value="Other">Other</option>
+            </select>
+
+            <label className="font-medium">Location</label>
+            <input
+              name="location"
+              defaultValue={issue.location}
+              className="w-full p-2 border rounded"
+              required
+            />
+
+            <label className="font-medium">Description</label>
+            <textarea
+              name="description"
+              defaultValue={issue.description}
+              className="w-full p-2 border rounded"
+              rows="4"
+              required
+            />
+
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 bg-gray-400 text-white rounded"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={uploading}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                {uploading ? "Uploading..." : "Update"}
+              </button>
+            </div>
+          </form>
         </div>
       )}
-
-      {/* TIMELINE --------------------------------------------- */}
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-4">Issue Timeline</h2>
-
-        <div className="border-l-4 border-green-400 pl-6 space-y-6">
-          {issue.timeline
-            .slice()
-            .reverse()
-            .map((t, i) => (
-              <div key={i} className="relative">
-                <div className="absolute -left-3 top-1 w-4 h-4 bg-green-500 rounded-full mr-4"></div>
-
-                <p className="text-sm text-gray-500 ml-3">
-                  {new Date(t.time).toLocaleString()}
-                </p>
-
-                <p className="font-bold ml-3">
-                  {t.status}
-                </p>
-
-                <p className="text-gray-700 ml-3">{t.message}</p>
-
-                <p className="text-sm text-gray-600 ml-3">
-                  Updated by: <strong>{t.updatedBy}</strong>
-                </p>
-              </div>
-            ))}
-        </div>
-      </div>
     </div>
   );
 };

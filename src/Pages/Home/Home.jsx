@@ -5,12 +5,14 @@ import Features from './Features';
 import HowItWorks from './HowItWorks';
 import Impact from './Impact';
 import GetInvolved from './GetInvolved';
+import LatestResolved from './LatestResolved';
 
 const Home = () => {
     return (
         <div>
             <Banner></Banner>
             {/* latest resolved section */}
+            <LatestResolved></LatestResolved>
             <Features></Features>
             <HowItWorks></HowItWorks>
             <Impact></Impact>
