@@ -146,7 +146,7 @@ const ManageStaff = () => {
         <h1 className="text-3xl font-bold">Manage Staff</h1>
         <button
           onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded"
+          className="px-4 py-2 btn-btn text-white rounded"
         >
           Add Staff +
         </button>
@@ -167,15 +167,15 @@ const ManageStaff = () => {
           {staff.map((s) => (
             <tr key={s.email}>
               <td className="border p-3">
-                <img src={s.photoURL} className="w-12 h-12 rounded-full" />
+                <img src={s.photoURL} className="w-12 h-12 rounded-full mx-auto" />
               </td>
-              <td className="border p-3">{s.name}</td>
-              <td className="border p-3">{s.email}</td>
-              <td className="border p-3">{s.phone}</td>
-              <td className="border p-3">
+              <td className="border p-3 text-center">{s.name}</td>
+              <td className="border p-3 text-center">{s.email}</td>
+              <td className="border p-3 text-center">{s.phone}</td>
+              <td className="border p-3 text-center">
                 <button
                   onClick={() => handleEdit(s)}
-                  className="px-3 py-1 bg-yellow-500 text-white rounded mr-2"
+                  className="px-3 py-1 btn-btn cursor-pointer text-white rounded mr-2"
                 >
                   Update
                 </button>
@@ -230,14 +230,14 @@ const ManageStaff = () => {
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 bg-gray-400 text-white rounded"
+                className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-4 py-2 btn-btn text-white rounded"
               >
                 Add
               </button>
@@ -254,7 +254,7 @@ const ManageStaff = () => {
             onSubmit={handleUpdateSubmit}
             className="bg-white p-6 rounded w-96 space-y-3"
           >
-            <h2 className="text-xl font-bold mb-3">Update Staff</h2>
+            <h2 className="text-2xl font-bold mb-3">Update Staff</h2>
 
             <label className="font-bold">Name</label>
             <input
@@ -284,14 +284,14 @@ const ManageStaff = () => {
               <button
                 type="button"
                 onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 bg-gray-400 text-white rounded"
+                className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-4 py-2 btn-btn text-white rounded"
               >
                 Update
               </button>

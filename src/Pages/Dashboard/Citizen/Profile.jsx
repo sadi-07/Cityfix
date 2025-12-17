@@ -121,7 +121,7 @@ const Profile = () => {
           {/* Edit Profile Button */}
           <button
             onClick={() => setShowModal(true)}
-            className="px-6 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition"
+            className="px-6 py-2 btn-btn text-white font-medium rounded transition cursor-pointer"
           >
             Edit Profile
           </button>
@@ -130,9 +130,9 @@ const Profile = () => {
           {!user.subscription?.status && !user.blocked && (
             <button
               onClick={handleSubscribe}
-              className="px-6 py-2 bg-green-600 text-white font-medium rounded hover:bg-green-700 transition"
+              className="px-6 py-2 btn-btn text-white font-medium rounded transition cursor-pointer"
             >
-              Subscribe 1000tk
+              Subscribe
             </button>
           )}
         </div>
@@ -186,7 +186,7 @@ const Profile = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                  className="px-4 py-2 btn-btn text-white rounded hover:bg-primary-focus transition"
                 >
                   {loading ? "Updating..." : "Update"}
                 </button>

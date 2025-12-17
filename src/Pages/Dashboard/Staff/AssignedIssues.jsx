@@ -129,7 +129,7 @@ const AssignedIssues = () => {
                 <button
                   className={`px-3 py-1 rounded text-white ${issue.status === "Closed"
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-blue-600"
+                      : "btn-btn cursor-pointer"
                     }`}
                   disabled={issue.status === "Closed"}
                   onClick={() =>
@@ -158,7 +158,7 @@ const AssignedIssues = () => {
                   )}
 
                   <Link to={`/issues/${issue._id}`}>
-                    <button className="px-3 py-1 rounded text-white bg-gray-800">View Details</button>
+                    <button className="px-3 py-1 rounded text-white bg-gray-800 cursor-pointer">View Details</button>
                   </Link>
               </td>
 

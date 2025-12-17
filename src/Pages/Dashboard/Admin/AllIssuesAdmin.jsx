@@ -137,7 +137,7 @@ const AllIssuesAdmin = () => {
                     className={`px-3 py-1 rounded text-white
     ${issue.assignedStaff || issue.status === "Rejected"
                         ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
+                        : "btn-btn"
                       }`}
                   >
                     Assign
@@ -225,7 +225,7 @@ const AllIssuesAdmin = () => {
                     staffId: selectedStaff,
                   })
                 }
-                className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+                className="px-4 py-2 btn-btn text-white rounded disabled:opacity-50"
               >
                 Assign
               </button>

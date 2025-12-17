@@ -83,6 +83,7 @@ const MyIssues = () => {
           <option value="">Status</option>
           <option value="Pending">Pending</option>
           <option value="In-progress">In-progress</option>
+          <option value="Working">Working</option>
           <option value="Resolved">Resolved</option>
         </select>
 
@@ -129,7 +130,7 @@ const MyIssues = () => {
                 <td className="border p-2 flex gap-2 justify-center">
                   {issue.status === "Pending" && (
                     <button
-                      className="px-3 py-1 bg-blue-600 text-white rounded"
+                      className="px-3 py-1 btn-btn text-white rounded"
                       onClick={() => setEditIssue(issue)}
                     >
                       Edit

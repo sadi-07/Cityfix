@@ -6,7 +6,8 @@
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
-  --color-primary: #576BFE;
+  --color-primary: #495eff;
+  --color-primary-focus: #2b44ff; /* 👈 hover color */
   --color-secondary: #27ACFE;
 }
 
@@ -14,6 +15,10 @@ body {
   font-family: "Urbanist", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
+}
+
+.btn-btn {
+  @apply bg-[#495eff] hover:bg-[#2841ff]
 }
 
 .bg-gradient {

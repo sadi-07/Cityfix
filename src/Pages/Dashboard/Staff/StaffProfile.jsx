@@ -83,7 +83,7 @@ const StaffProfile = () => {
 
         <button
           onClick={() => setShowModal(true)}
-          className="px-6 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition"
+          className="px-6 py-2 btn-btn cursor-pointer text-white font-medium rounded transition"
         >
           Edit Profile
         </button>

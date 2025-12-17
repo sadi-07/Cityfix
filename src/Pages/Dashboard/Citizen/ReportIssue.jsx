@@ -93,7 +93,7 @@ const ReportIssue = () => {
           You reached your free limit (3 issues).
           <button
             onClick={() => navigate("/dashboard/profile")}
-            className="ml-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+            className="ml-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
           >
             Upgrade to Premium
           </button>
@@ -179,7 +179,7 @@ const ReportIssue = () => {
           className={`w-full py-3 text-white rounded font-bold cursor-pointer text-xl ${
             limitReached
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
+              : "btn-btn"
           }`}
         >
           {loading ? "Submitting..." : "Submit Issue"}
