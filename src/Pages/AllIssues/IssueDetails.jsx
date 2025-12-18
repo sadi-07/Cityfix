@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import Loading from "../../Components/Shared/Loading";
 import Swal from "sweetalert2";
 import { imageUpload } from "../../Utils";
+import { ThumbsUp } from "lucide-react";
 
 const backend = "http://localhost:3000";
 
@@ -147,32 +148,34 @@ const IssueDetails = () => {
       <div className="flex gap-4 mt-6">
         <button
           onClick={handleUpvote}
-          className="px-4 py-2 bg-green-600 text-white rounded"
+          className="px-4 py-2 bg-gradient hover:scale-103 text-white rounded flex items-center justify-center gap-2 font-bold text-lg"
         >
-          👍 Upvote {issue.upvoteCount || 0}
+          <ThumbsUp></ThumbsUp> <span className="mt-1">{issue.upvoteCount || 0}</span>
         </button>
 
-        <button
-          disabled={issue.status !== "Pending"}
-          onClick={() => setShowEditModal(true)}
-          className={`px-4 py-2 text-white rounded ${
-            issue.status !== "Pending"
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600"
-          }`}
-        >
-          Edit
-        </button>
+         {/* 👍  */}
+
+        {user?.email === issue.email && (
+          <button
+            disabled={issue.status !== "Pending"}
+            onClick={() => setShowEditModal(true)}
+            className={`px-4 py-2 text-white rounded ${issue.status !== "Pending"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-primary"
+              }`}
+          >
+            Edit
+          </button>
+        )}
 
         {user?.email === issue.email && (
           <button
             disabled={issue.status !== "Pending"}
             onClick={handleDelete}
-            className={`px-4 py-2 text-white rounded ${
-            issue.status !== "Pending"
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-red-600"
-          }`}
+            className={`px-4 py-2 text-white rounded ${issue.status !== "Pending"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-red-600"
+              }`}
           >
             Delete
           </button>
@@ -247,14 +250,14 @@ const IssueDetails = () => {
               <button
                 type="button"
                 onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 bg-gray-400 text-white rounded"
+                className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={uploading}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-4 py-2 btn-btn text-white rounded"
               >
                 {uploading ? "Uploading..." : "Update"}
               </button>

@@ -137,7 +137,7 @@ const StaffProfile = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                  className="px-4 py-2 btn-btn text-white rounded transition"
                 >
                   {loading ? "Updating..." : "Update"}
                 </button>

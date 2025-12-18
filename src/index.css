@@ -18,7 +18,7 @@ body {
 }
 
 .btn-btn {
-  @apply bg-[#495eff] hover:bg-[#2841ff]
+  @apply bg-[#6274ff] hover:bg-[#3950ff]
 }
 
 .bg-gradient {
