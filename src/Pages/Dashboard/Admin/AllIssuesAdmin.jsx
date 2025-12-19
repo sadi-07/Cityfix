@@ -72,8 +72,8 @@ const AllIssuesAdmin = () => {
 
   // ⭐ Correct sorting logic
   const sortedIssues = [...issues].sort((a, b) => {
-    const aHigh = a.priority === "high";
-    const bHigh = b.priority === "high";
+    const aHigh = a.priority === "High";
+    const bHigh = b.priority === "High";
     if (aHigh && !bHigh) return -1;
     if (!aHigh && bHigh) return 1;
     return 0;
@@ -107,7 +107,7 @@ const AllIssuesAdmin = () => {
                 <td className="p-2 border">{issue.status}</td>
 
                 <td
-                  className={`p-2 border ${issue.priority === "high"
+                  className={`p-2 border ${issue.priority === "High"
                     ? "text-red-600 font-bold"
                     : "text-gray-700"
                     }`}

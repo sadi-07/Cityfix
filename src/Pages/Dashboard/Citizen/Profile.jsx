@@ -3,6 +3,7 @@ import { AuthContext } from "../../../Context/AuthProvider";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../../Utils";
+import Swal from "sweetalert2";
 
 const backend = "http://localhost:3000";
 
@@ -10,7 +11,9 @@ const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
 
+  console.log(user);
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       name: "",
@@ -18,6 +21,14 @@ const Profile = () => {
     },
 
   });
+
+
+  useEffect(() => {
+  if (user?.blocked === true) {
+    setShowBlockedModal(true);
+  }
+}, [user]);
+
 
   // Reset form whenever user changes
   useEffect(() => {
@@ -67,20 +78,44 @@ const Profile = () => {
 
   // Handle subscription (skipping actual payment logic)
   const handleSubscribe = async () => {
+    if (user.subscription?.status === "active") {
+      return toast.error("Already subscribed");
+    }
+
+    const result = await Swal.fire({
+      title: "Confirm Subscription",
+      text: "This will cost 1000 BDT. Do you want to continue?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Pay 1000৳",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const res = await fetch(`${backend}/users/subscribe/${user.email}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscription: { status: "active", plan: "Premium" } }),
       });
-      const updated = await res.json();
-      setUser((prev) => ({ ...prev, ...updated }));
-      toast.success("Subscribed successfully! You are now a Premium user.");
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return toast.error(data.message || "Subscription failed");
+      }
+
+      setUser((prev) => ({ ...prev, ...data }));
+      toast.success("Payment successful! You are now a Premium user 🎉");
     } catch (err) {
       console.log(err);
       toast.error("Subscription failed");
     }
   };
+
+
 
   if (!user) {
     return <p className="text-center mt-10 text-gray-500">Loading...</p>;
@@ -195,6 +230,28 @@ const Profile = () => {
           </div>
         </div>
       )}
+
+      {showBlockedModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full text-center">
+            <h2 className="text-2xl font-bold text-red-600 mb-3">
+              Account Blocked
+            </h2>
+            <p className="text-gray-700 mb-5">
+              Your account has been blocked by the admin.
+              <br />
+              Please contact the authorities for assistance.
+            </p>
+            <button
+              onClick={() => setShowBlockedModal(false)}
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

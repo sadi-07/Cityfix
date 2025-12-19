@@ -83,14 +83,34 @@ const IssueDetails = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["issue", id]);
       queryClient.invalidateQueries(["issues"]);
-      alert("Payment successful! Issue boosted.");
+      toast.success("Payment successful! Issue boosted.");
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Boost failed");
     },
   });
 
   const handleBoost = () => {
-    if (issue.priority === "High") return;
-    if (confirm("Boost issue for 100 BDT ?")) boostMutation.mutate();
+    // 1️⃣ login guard
+    if (!user) return navigate("/login");
+
+    // 2️⃣ prevent double boost
+    if (issue.priority === "High") {
+      return toast.error("Issue already boosted");
+    }
+
+    Swal.fire({
+      title: "Boost this issue?",
+      text: "100BDT. needed to boost this issue",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Boost",
+    }).then((res) => {
+      if (res.isConfirmed) boostMutation.mutate();
+    });
   };
+
 
   // EDIT
   const editMutation = useMutation({
@@ -153,15 +173,15 @@ const IssueDetails = () => {
           <ThumbsUp></ThumbsUp> <span className="mt-1">{issue.upvoteCount || 0}</span>
         </button>
 
-         {/* 👍  */}
+        {/* 👍  */}
 
         {user?.email === issue.email && (
           <button
             disabled={issue.status !== "Pending"}
             onClick={() => setShowEditModal(true)}
             className={`px-4 py-2 text-white rounded ${issue.status !== "Pending"
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-primary"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary"
               }`}
           >
             Edit
@@ -173,22 +193,34 @@ const IssueDetails = () => {
             disabled={issue.status !== "Pending"}
             onClick={handleDelete}
             className={`px-4 py-2 text-white rounded ${issue.status !== "Pending"
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-red-600"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-red-600"
               }`}
           >
             Delete
           </button>
         )}
 
-        {user?.email === issue.email && issue.priority !== "High" && (
+        {user?.email === issue.email && (
           <button
             onClick={handleBoost}
-            className="px-4 py-2 bg-purple-600 text-white rounded"
+            disabled={issue.priority === "High" || boostMutation.isLoading}
+            className={`px-4 py-2 text-white rounded ${issue.priority === "High"
+                ? "bg-gray-400 cursor-not-allowed"
+                : boostMutation.isLoading
+                  ? "bg-purple-400 cursor-not-allowed"
+                  : "bg-purple-600"
+              }`}
           >
-            Boost (100 BDT)
+            {issue.priority === "High"
+              ? "Already Boosted"
+              : boostMutation.isLoading
+                ? "Boosting..."
+                : "Boost (100 BDT)"}
           </button>
         )}
+
+
       </div>
 
       {/* EDIT MODAL */}
