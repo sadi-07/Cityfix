@@ -1,7 +1,16 @@
-import React from "react";
-import { Link } from "react-router";
+import axios from "axios";
+import React, { useEffect } from "react";
+import { Link, useSearchParams } from "react-router";
 
 const PaymentSuccess = () => {
+  const [params] = useSearchParams();
+
+  useEffect(() => {
+    const sessionId = params.get("session_id");
+    if (!sessionId) return;
+
+    axios.post(`http://localhost:3000/payments/verify`, { sessionId });
+  }, []);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-100 text-center px-4">
       <img

@@ -25,8 +25,9 @@ const IssueDetails = () => {
   try {
     const paymentInfo = {
       issueId: issue._id,
-      senderEmail: user.email,
+      email: user.email,
       issueName: issue.title,
+      type: "boost",
     };
 
     const res = await axios.post(
@@ -114,26 +115,25 @@ const IssueDetails = () => {
     },
   });
 
-  const handleBoost = () => {
-    // 1️⃣ login guard
-    if (!user) return navigate("/login");
+  const handleBoost = async () => {
+  if (!user) return navigate("/login");
+  if (issue.priority === "High") return toast.error("Issue already boosted");
 
-    // 2️⃣ prevent double boost
-    if (issue.priority === "High") {
-      return toast.error("Issue already boosted");
-    }
-
-    Swal.fire({
-      title: "Boost this issue?",
-      text: "100BDT. needed to boost this issue",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      confirmButtonText: "Boost",
-    }).then((res) => {
-      if (res.isConfirmed) boostMutation.mutate();
+  try {
+    const res = await axios.post(`${backend}/create-checkout-session`, {
+      email: user.email,
+      type: "boost",
+      issueId: issue._id,
     });
-  };
+
+    // Redirect to Stripe checkout
+    window.location.href = res.data.url;
+  } catch (err) {
+    console.error(err);
+    toast.error("Payment initiation failed");
+  }
+};
+
 
 
   // EDIT

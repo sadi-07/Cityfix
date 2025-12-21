@@ -3,7 +3,6 @@ import { AuthContext } from "../../../Context/AuthProvider";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../../Utils";
-import Swal from "sweetalert2";
 
 const backend = "http://localhost:3000";
 
@@ -14,14 +13,13 @@ const Profile = () => {
   const [showBlockedModal, setShowBlockedModal] = useState(false);
 
   console.log(user);
+
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       name: "",
       email: "",
     },
-
   });
-
 
   useEffect(() => {
     if (user?.blocked === true) {
@@ -29,15 +27,12 @@ const Profile = () => {
     }
   }, [user]);
 
-
-  // Reset form whenever user changes
   useEffect(() => {
     if (user) {
       reset({
         name: user.name || "",
         email: user.email || "",
       });
-
     }
   }, [user, reset]);
 
@@ -47,15 +42,11 @@ const Profile = () => {
     try {
       let photoURL = user.photoURL;
 
-      // upload image if selected
       if (data.image && data.image[0]) {
         photoURL = await imageUpload(data.image[0]);
       }
 
-      const payload = {
-        name: data.name,
-        photoURL,
-      };
+      const payload = { name: data.name, photoURL };
 
       const res = await fetch(`${backend}/users/update/${user.email}`, {
         method: "PATCH",
@@ -75,46 +66,39 @@ const Profile = () => {
     }
   };
 
-
-  // Handle subscription (skipping actual payment logic)
+  // Handle subscription via Stripe
   const handleSubscribe = async () => {
-    if (user.subscription?.status === "active") {
-      return toast.error("Already subscribed");
-    }
-
-    const result = await Swal.fire({
-      title: "Confirm Subscription",
-      text: "This will cost 1000 BDT. Do you want to continue?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, Pay 1000৳",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-    });
-
-    if (!result.isConfirmed) return;
-
     try {
-      const res = await fetch(`${backend}/users/subscribe/${user.email}`, {
-        method: "PATCH",
+      const res = await fetch(`${backend}/create-checkout-session`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "subscribe",
+          email: user.email,
+        }),
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        return toast.error(data.message || "Subscription failed");
-      }
-
-      setUser((prev) => ({ ...prev, ...data }));
-      toast.success("Payment successful! You are now a Premium user 🎉");
+      window.location.href = data.url; // redirect to Stripe checkout
     } catch (err) {
-      console.log(err);
-      toast.error("Subscription failed");
+      toast.error("Payment failed");
     }
   };
 
+  useEffect(() => {
+  const fetchUser = async () => {
+    if (!user?.email) return;
+    try {
+      const res = await fetch(`${backend}/users/${user.email}`);
+      const updatedUser = await res.json();
+      // Merge with existing user so that local fields (like photoURL) are not lost
+      setUser((prev) => ({ ...prev, ...updatedUser }));
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
+  };
+  fetchUser();
+}, [user?.email, setUser]);
 
 
   if (!user) {
@@ -125,7 +109,7 @@ const Profile = () => {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">My Profile</h1>
 
-      {/* BLOCKED WARNING - ALWAYS SHOWN IF BLOCKED */}
+      {/* BLOCKED WARNING */}
       {user.blocked && (
         <div className="bg-red-100 border border-red-400 text-red-800 p-4 rounded mb-6">
           Your account is blocked. Please contact authorities for assistance.
@@ -142,7 +126,9 @@ const Profile = () => {
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
-            {user.subscription?.status === "active" && (
+
+            {/* PREMIUM BADGE */}
+            {user.premium && (
               <span className="bg-yellow-300 text-yellow-800 text-sm font-semibold px-2 py-1 rounded">
                 Premium
               </span>
@@ -161,8 +147,8 @@ const Profile = () => {
             Edit Profile
           </button>
 
-          {/* Subscribe Button - ONLY if not already premium */}
-          {!user.subscription?.status && !user.blocked && (
+          {/* Subscribe Button - hide if already premium */}
+          {!user.premium && !user.blocked && (
             <button
               onClick={handleSubscribe}
               className="px-6 py-2 btn-btn text-white font-medium rounded transition cursor-pointer"
@@ -209,7 +195,6 @@ const Profile = () => {
                 />
               </div>
 
-
               <div className="flex justify-end gap-3 mt-4">
                 <button
                   type="button"
@@ -251,7 +236,6 @@ const Profile = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };
