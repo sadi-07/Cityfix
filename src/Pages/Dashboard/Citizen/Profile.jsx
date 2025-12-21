@@ -24,10 +24,10 @@ const Profile = () => {
 
 
   useEffect(() => {
-  if (user?.blocked === true) {
-    setShowBlockedModal(true);
-  }
-}, [user]);
+    if (user?.blocked === true) {
+      setShowBlockedModal(true);
+    }
+  }, [user]);
 
 
   // Reset form whenever user changes

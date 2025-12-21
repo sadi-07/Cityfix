@@ -21,6 +21,30 @@ const IssueDetails = () => {
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
 
+  const handlePayment = async () => {
+  try {
+    const paymentInfo = {
+      issueId: issue._id,
+      senderEmail: user.email,
+      issueName: issue.title,
+    };
+
+    const res = await axios.post(
+      "http://localhost:3000/create-checkout-session",
+      paymentInfo
+    );
+
+    // 🔥 THIS opens Stripe Checkout
+    window.location.href = res.data.url;
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Payment initiation failed");
+  }
+};
+
+
+
   // FETCH ISSUE
   const { data: issue, isLoading } = useQuery({
     queryKey: ["issue", id],
@@ -203,7 +227,7 @@ const IssueDetails = () => {
 
         {user?.email === issue.email && (
           <button
-            onClick={handleBoost}
+            onClick={handlePayment}
             disabled={issue.priority === "High" || boostMutation.isLoading}
             className={`px-4 py-2 text-white rounded ${issue.priority === "High"
                 ? "bg-gray-400 cursor-not-allowed"

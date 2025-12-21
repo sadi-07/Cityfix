@@ -24,6 +24,8 @@ import IssueDetails from "../Pages/AllIssues/IssueDetails";
 import PaymentsPage from "../Pages/Dashboard/Admin/Payments";
 import AdminProfile from "../Pages/Dashboard/Admin/AdminProfile";
 import StaffProfile from "../Pages/Dashboard/Staff/StaffProfile";
+import PaymentSuccess from "../Payment/PaymentSuccess";
+import PaymentCancel from "../Payment/PaymentCancel";
 
 
 
@@ -60,6 +62,8 @@ const router = createBrowserRouter([
       { path: "profile", element: <Profile /> },
       { path: "report-issue", element: <ReportIssue /> },
       { path: "my-issues", element: <MyIssues /> },
+      { path: "payment-success", element: <PaymentSuccess />},
+      { path: "payment-cancelled", element: <PaymentCancel />},
 
       // Staff
       { path: "assigned-issues", element: <StaffRoute><AssignedIssues /></StaffRoute> },
