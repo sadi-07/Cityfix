@@ -29,14 +29,3 @@ A digital platform where citizens report real-world public infrastructure issues
 10. **User-Friendly Interface:** Clean, responsive design for easy navigation on desktop and mobile.  
 
 ---
-
-
----
-
-## Technology Stack
-- **Frontend:** React, Tailwind CSS  
-- **Backend:** Node.js, Express
-- **Database:** MongoDB 
-- **Deployment:** Vercel/Netlify  
-
----
