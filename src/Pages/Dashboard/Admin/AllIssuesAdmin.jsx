@@ -16,7 +16,7 @@ const AllIssuesAdmin = () => {
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["all-issues"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/issues");
+      const res = await fetch("https://city-fix-server-one.vercel.app/issues");
       return res.json();
     },
   });
@@ -25,7 +25,7 @@ const AllIssuesAdmin = () => {
   const { data: staffList = [] } = useQuery({
     queryKey: ["staff"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/users?role=staff");
+      const res = await fetch("https://city-fix-server-one.vercel.app/users?role=staff");
       return res.json();
     },
   });
@@ -35,7 +35,7 @@ const AllIssuesAdmin = () => {
   const assignStaffMutation = useMutation({
     mutationFn: async ({ issueId, staffId }) => {
       const res = await fetch(
-        `http://localhost:3000/issues/assign/${issueId}`,
+        `https://city-fix-server-one.vercel.app/issues/assign/${issueId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -55,7 +55,7 @@ const AllIssuesAdmin = () => {
   // ⭐ Reject issue Mutation
   const rejectMutation = useMutation({
     mutationFn: async (id) => {
-      const res = await fetch(`http://localhost:3000/issues/reject/${id}`, {
+      const res = await fetch(`https://city-fix-server-one.vercel.app/issues/reject/${id}`, {
         method: "PATCH",
       });
       return res.json();

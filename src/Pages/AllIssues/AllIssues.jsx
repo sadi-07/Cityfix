@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { ThumbsUp } from "lucide-react";
+import Loading from "../../Components/Shared/Loading";
 
 const AllIssues = () => {
   const [filteredIssues, setFilteredIssues] = useState([]);
@@ -17,7 +19,7 @@ const AllIssues = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const backend = "http://localhost:3000";
+  const backend = "https://city-fix-server-one.vercel.app";
   const queryClient = useQueryClient();
 
   // 🔥 Fetch all issues
@@ -92,7 +94,7 @@ const AllIssues = () => {
     upvoteMutation.mutate(issue);
   };
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Loading />;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -145,7 +147,7 @@ const AllIssues = () => {
       {/* Issues List */}
       <div className="grid md:grid-cols-3 gap-6">
         {filteredIssues.map((issue) => (
-          <div key={issue._id} className="shadow-lg border rounded p-4">
+          <div key={issue._id} className="shadow-lg border border-gray-400 rounded p-4 hover:scale-103 hover:shadow-xl transition">
             {issue.image && (
               <img
                 src={issue.image}
@@ -178,14 +180,14 @@ const AllIssues = () => {
             <div className="mt-4 flex justify-between items-center flex-wrap gap-2">
               <button
                 onClick={() => handleUpvote(issue)}
-                className="px-3 py-1 bg-green-600 text-white rounded"
+                className="px-3 py-1 bg-green-600 text-white rounded flex bg-gradient gap-2 items-center justify-center font-bold"
               >
-                👍 {issue.upvoteCount || 0}
+                <ThumbsUp /> <span className="mt-1"> {issue.upvoteCount || 0} </span>
               </button>
 
               <Link
                 to={`/issues/${issue._id}`}
-                className="px-3 py-1 bg-gray-800 text-white rounded"
+                className="px-4 py-2 font-bold bg-gray-800 text-white rounded"
               >
                 View Details
               </Link>

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import axios from "axios";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const LatestResolved = () => {
   const { data: issues = [], isLoading } = useQuery({

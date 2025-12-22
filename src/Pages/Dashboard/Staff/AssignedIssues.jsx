@@ -4,7 +4,7 @@ import axios from "axios";
 import { Link } from "react-router";
 import toast from "react-hot-toast";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const statusFlow = {
   Pending: ["In-Progress"],

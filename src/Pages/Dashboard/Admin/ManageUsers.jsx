@@ -5,7 +5,7 @@ import Loading from "../../../Components/Shared/Loading";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const ManageUsers = () => {
   const queryClient = useQueryClient();

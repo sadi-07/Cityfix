@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../../Utils";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const AdminProfile = () => {
   const { user, setUser } = useContext(AuthContext);

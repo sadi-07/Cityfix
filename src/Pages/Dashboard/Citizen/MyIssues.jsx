@@ -4,8 +4,9 @@ import { AuthContext } from "../../../Context/AuthProvider";
 import { Link } from "react-router";
 import axios from "axios";
 import Swal from "sweetalert2";
+import Loading from "../../../Components/Shared/Loading";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const MyIssues = () => {
   const { user } = useContext(AuthContext);
@@ -58,7 +59,7 @@ const MyIssues = () => {
     },
   });
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Loading />
 
   // Apply filters
   let filtered = [...issues];

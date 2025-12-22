@@ -17,7 +17,7 @@ import {
 
 const CitizenDashboard = () => {
   const { user } = useContext(AuthContext);
-  const backend = "http://localhost:3000";
+  const backend = "https://city-fix-server-one.vercel.app";
 
   // ================= FETCH DATA =================
   const { data: issues = [], isLoading: loadingIssues } = useQuery({

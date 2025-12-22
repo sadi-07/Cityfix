@@ -4,7 +4,7 @@ import axios from "axios";
 import { AuthContext } from "../../../Context/AuthProvider";
 import Loading from "../../../Components/Shared/Loading";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const StaffDashboard = () => {
   const { user } = useContext(AuthContext);

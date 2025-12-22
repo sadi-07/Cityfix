@@ -3,14 +3,20 @@ import { AuthContext } from "../../../Context/AuthProvider";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../../Utils";
+import Loading from "../../../Components/Shared/Loading";
+import { useQuery } from "@tanstack/react-query";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
+  const [userLoading, setUserLoading] = useState(true);
+
+
+  
 
   console.log(user);
 
@@ -88,22 +94,37 @@ const Profile = () => {
   useEffect(() => {
   const fetchUser = async () => {
     if (!user?.email) return;
+
     try {
+      setUserLoading(true);
+
       const res = await fetch(`${backend}/users/${user.email}`);
       const updatedUser = await res.json();
-      // Merge with existing user so that local fields (like photoURL) are not lost
-      setUser((prev) => ({ ...prev, ...updatedUser }));
+
+      setUser((prev) => ({
+        ...prev,
+        ...updatedUser,
+      }));
     } catch (err) {
       console.error("Failed to fetch user:", err);
+    } finally {
+      setUserLoading(false);
     }
   };
+
   fetchUser();
 }, [user?.email, setUser]);
+
 
 
   if (!user) {
     return <p className="text-center mt-10 text-gray-500">Loading...</p>;
   }
+
+  if (!user || userLoading) {
+  return <Loading />;
+}
+
 
   return (
     <div className="max-w-4xl mx-auto p-6">

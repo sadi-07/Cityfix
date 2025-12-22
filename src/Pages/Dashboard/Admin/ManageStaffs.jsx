@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../../Utils";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const ManageStaff = () => {
   const queryClient = useQueryClient();

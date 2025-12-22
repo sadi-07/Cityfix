@@ -50,7 +50,7 @@ const Register = () => {
             await updateUserProfile(name, imageURL, "citizen");
 
             // Save user to MongoDB
-            await axios.post("http://localhost:3000/users", {
+            await axios.post("https://city-fix-server-one.vercel.app/users", {
                 name,
                 email,
                 photo: imageURL,
@@ -118,7 +118,7 @@ const Register = () => {
             );
 
             // Save Google user to MongoDB
-            await axios.post("http://localhost:3000/users", {
+            await axios.post("https://city-fix-server-one.vercel.app/users", {
                 name: user.displayName,
                 email: user.email,
                 photo: user.photoURL,

@@ -2,7 +2,7 @@ import axios from 'axios';
 import React from 'react';
 
 const axiosSecure = axios.create({
-    baseURL: 'http://localhost:3000'
+    baseURL: 'https://city-fix-server-one.vercel.app'
 })
 
 const useAxiosSecure = () => {

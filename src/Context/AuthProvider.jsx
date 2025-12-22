@@ -21,7 +21,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const backendURL = "http://localhost:3000";
+  const backendURL = "https://city-fix-server-one.vercel.app";
 
   // CREATE USER
   const createUser = async (email, password) => {
@@ -100,7 +100,7 @@ const AuthProvider = ({ children }) => {
 
     if (currentUser) {
       try {
-        const res = await fetch(`http://localhost:3000/users/${currentUser.email}`);
+        const res = await fetch(`https://city-fix-server-one.vercel.app/users/${currentUser.email}`);
         const dbUser = await res.json();
 
         // Merge Firebase + MongoDB user

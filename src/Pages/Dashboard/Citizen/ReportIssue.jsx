@@ -4,44 +4,72 @@ import { AuthContext } from "../../../Context/AuthProvider";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import { imageUpload } from "../../../Utils";
+import Loading from "../../../Components/Shared/Loading";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const ReportIssue = () => {
   const { user } = useContext(AuthContext);
-  const [issueCount, setIssueCount] = useState(0);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const [issueCount, setIssueCount] = useState(0);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [userLoading, setUserLoading] = useState(true);
+  const [dbUser, setDbUser] = useState(null);
 
   const { register, handleSubmit, reset } = useForm();
 
-  // Fetch user's issue count
+  // ================= FETCH FULL USER FROM DB =================
   useEffect(() => {
-    if (user?.email) {
-      fetch(`${backend}/issues/count/${user.email}`)
-        .then((res) => res.json())
-        .then((data) => setIssueCount(data.count));
-    }
-  }, [user]);
+    const fetchUser = async () => {
+      if (!user?.email) return;
 
-  const isFreeUser = !user?.subscription?.status;
+      try {
+        setUserLoading(true);
+        const res = await fetch(`${backend}/users/${user.email}`);
+        const data = await res.json();
+        setDbUser(data);
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [user?.email]);
+
+  // ================= FETCH USER ISSUE COUNT =================
+  useEffect(() => {
+    if (!user?.email) return;
+
+    fetch(`${backend}/issues/count/${user.email}`)
+      .then((res) => res.json())
+      .then((data) => setIssueCount(data.count))
+      .catch(() => {});
+  }, [user?.email]);
+
+  // ================= LOADER =================
+  if (userLoading || !dbUser) {
+    return <Loading />;
+  }
+
+  const isFreeUser = !dbUser.subscription?.status;
   const limitReached = isFreeUser && issueCount >= 3;
 
-  // Submit Handler
+  // ================= SUBMIT HANDLER =================
   const onSubmit = async (data) => {
     if (limitReached) {
-      return toast.error("Issue limit reached! Please upgrade to Premium.");
+      return toast.error("Issue limit reached! Upgrade to Premium.");
     }
 
-    setLoading(true);
+    setSubmitLoading(true);
 
     try {
       let imageURL = "";
 
-      // If user uploaded an image file — upload it to ImgBB
       if (data.imageFile && data.imageFile.length > 0) {
-        const file = data.imageFile[0];
-        imageURL = await imageUpload(file);
+        imageURL = await imageUpload(data.imageFile[0]);
       }
 
       const res = await fetch(`${backend}/issues`, {
@@ -52,48 +80,40 @@ const ReportIssue = () => {
           description: data.description,
           category: data.category,
           location: data.location,
-          image: imageURL, // saved URL from ImgBB
+          image: imageURL,
           userEmail: user.email,
-          status: "Pending",
-          timeline: [
-            {
-              message: "Issue created",
-              time: new Date(),
-            },
-          ],
         }),
       });
 
       const result = await res.json();
 
-      if (res.ok) {
-        toast.success("Issue reported successfully!");
-        reset();
-        navigate("/dashboard/my-issues");
-      } else {
-        toast.error(result.message || "Failed to create issue");
+      if (!res.ok) {
+        return toast.error(result.message || "Failed to create issue");
       }
+
+      toast.success("Issue reported successfully!");
+      reset();
+      navigate("/dashboard/my-issues");
     } catch (err) {
-      console.log(err);
-      toast.error("Something went wrong while submitting");
+      console.error(err);
+      toast.error("Something went wrong");
     } finally {
-      setLoading(false);
+      setSubmitLoading(false);
     }
   };
 
-  console.log(user.email)
-
+  // ================= UI =================
   return (
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-6">Report an Issue</h1>
 
-      {/* Free User Limit Warning */}
+      {/* FREE USER WARNING */}
       {limitReached && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 p-4 rounded mb-6">
           You reached your free limit (3 issues).
           <button
             onClick={() => navigate("/dashboard/profile")}
-            className="ml-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
+            className="ml-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
           >
             Upgrade to Premium
           </button>
@@ -104,32 +124,29 @@ const ReportIssue = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white shadow-lg p-6 rounded-lg space-y-4"
       >
-        {/* Title */}
+        {/* TITLE */}
         <div>
           <label className="font-bold text-lg">Issue Title</label>
           <input
-            type="text"
             {...register("title", { required: true })}
             className="w-full border p-2 rounded mt-1"
-            placeholder="Road broken, water problem..."
             disabled={limitReached}
             required
           />
         </div>
 
-        {/* Description */}
+        {/* DESCRIPTION */}
         <div>
           <label className="font-bold text-lg">Description</label>
           <textarea
             {...register("description", { required: true })}
             className="w-full border p-2 rounded mt-1 h-28"
-            placeholder="Describe the issue..."
             disabled={limitReached}
             required
-          ></textarea>
+          />
         </div>
 
-        {/* Category */}
+        {/* CATEGORY */}
         <div>
           <label className="font-bold text-lg">Category</label>
           <select
@@ -147,7 +164,7 @@ const ReportIssue = () => {
           </select>
         </div>
 
-        {/* Image Upload */}
+        {/* IMAGE */}
         <div>
           <label className="font-bold text-lg">Upload Image</label>
           <input
@@ -159,30 +176,26 @@ const ReportIssue = () => {
           />
         </div>
 
-        {/* Location */}
+        {/* LOCATION */}
         <div>
           <label className="font-bold text-lg">Location</label>
           <input
-            type="text"
             {...register("location", { required: true })}
             className="w-full border p-2 rounded mt-1"
-            placeholder="Your area / street name"
             disabled={limitReached}
             required
           />
         </div>
 
-        {/* Submit */}
+        {/* SUBMIT */}
         <button
           type="submit"
-          disabled={loading || limitReached}
-          className={`w-full py-3 text-white rounded font-bold cursor-pointer text-xl ${
-            limitReached
-              ? "bg-gray-400 cursor-not-allowed"
-              : "btn-btn"
+          disabled={submitLoading || limitReached}
+          className={`w-full py-3 text-white rounded font-bold text-xl ${
+            limitReached ? "bg-gray-400" : "btn-btn"
           }`}
         >
-          {loading ? "Submitting..." : "Submit Issue"}
+          {submitLoading ? "Submitting..." : "Submit Issue"}
         </button>
       </form>
     </div>

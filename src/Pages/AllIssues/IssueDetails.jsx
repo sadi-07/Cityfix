@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 import { imageUpload } from "../../Utils";
 import { ThumbsUp } from "lucide-react";
 
-const backend = "http://localhost:3000";
+const backend = "https://city-fix-server-one.vercel.app";
 
 const IssueDetails = () => {
   const { id } = useParams();
@@ -21,32 +21,7 @@ const IssueDetails = () => {
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
 
-  const handlePayment = async () => {
-  try {
-    const paymentInfo = {
-      issueId: issue._id,
-      email: user.email,
-      issueName: issue.title,
-      type: "boost",
-    };
-
-    const res = await axios.post(
-      "http://localhost:3000/create-checkout-session",
-      paymentInfo
-    );
-
-    // 🔥 THIS opens Stripe Checkout
-    window.location.href = res.data.url;
-
-  } catch (error) {
-    console.error(error);
-    toast.error("Payment initiation failed");
-  }
-};
-
-
-
-  // FETCH ISSUE
+  // ================= FETCH ISSUE =================
   const { data: issue, isLoading } = useQuery({
     queryKey: ["issue", id],
     queryFn: async () => {
@@ -56,7 +31,7 @@ const IssueDetails = () => {
     enabled: !!id,
   });
 
-  // UPVOTE
+  // ================= UPVOTE =================
   const upvoteMutation = useMutation({
     mutationFn: async () =>
       axios.patch(`${backend}/issues/upvote/${id}`, {
@@ -64,7 +39,6 @@ const IssueDetails = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries(["issue", id]);
-      queryClient.invalidateQueries(["issues"]);
     },
   });
 
@@ -77,7 +51,22 @@ const IssueDetails = () => {
     upvoteMutation.mutate();
   };
 
-  // DELETE
+  // ================= BOOST PAYMENT =================
+  const handlePayment = async () => {
+    try {
+      const res = await axios.post(`${backend}/create-checkout-session`, {
+        email: user.email,
+        type: "boost",
+        issueId: issue._id,
+      });
+
+      window.location.href = res.data.url;
+    } catch (err) {
+      toast.error("Payment initiation failed");
+    }
+  };
+
+  // ================= DELETE =================
   const deleteMutation = useMutation({
     mutationFn: async () => axios.delete(`${backend}/issues/${id}`),
     onSuccess: () => {
@@ -99,50 +88,12 @@ const IssueDetails = () => {
     });
   };
 
-  // BOOST
-  const boostMutation = useMutation({
-    mutationFn: async () =>
-      axios.patch(`${backend}/issues/boost/${id}`, {
-        userEmail: user?.email,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["issue", id]);
-      queryClient.invalidateQueries(["issues"]);
-      toast.success("Payment successful! Issue boosted.");
-    },
-    onError: (err) => {
-      toast.error(err.response?.data?.message || "Boost failed");
-    },
-  });
-
-  const handleBoost = async () => {
-  if (!user) return navigate("/login");
-  if (issue.priority === "High") return toast.error("Issue already boosted");
-
-  try {
-    const res = await axios.post(`${backend}/create-checkout-session`, {
-      email: user.email,
-      type: "boost",
-      issueId: issue._id,
-    });
-
-    // Redirect to Stripe checkout
-    window.location.href = res.data.url;
-  } catch (err) {
-    console.error(err);
-    toast.error("Payment initiation failed");
-  }
-};
-
-
-
-  // EDIT
+  // ================= EDIT =================
   const editMutation = useMutation({
     mutationFn: async (data) =>
       axios.patch(`${backend}/issues/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["issue", id]);
-      queryClient.invalidateQueries(["issues"]);
       toast.success("Issue updated successfully!");
       setShowEditModal(false);
     },
@@ -180,30 +131,36 @@ const IssueDetails = () => {
     <div className="max-w-4xl mx-auto py-8 px-4">
       <h1 className="text-4xl font-bold mb-4">{issue.title}</h1>
 
-      <img src={issue.image} className="w-full h-80 object-cover rounded mb-6" />
+      <img
+        src={issue.image}
+        className="w-full h-80 object-cover rounded mb-6"
+        alt=""
+      />
 
       <div className="space-y-2 text-lg">
         <p><strong>Category:</strong> {issue.category}</p>
         <p><strong>Location:</strong> {issue.location}</p>
         <p><strong>Status:</strong> {issue.status}</p>
+        <p><strong>Priority:</strong> {issue.priority}</p>
         <p><strong>Description:</strong> {issue.description}</p>
       </div>
 
-      <div className="flex gap-4 mt-6">
+
+
+      {/* ================= ACTION BUTTONS ================= */}
+      <div className="flex gap-4 mt-6 flex-wrap">
         <button
           onClick={handleUpvote}
-          className="px-4 py-2 bg-gradient hover:scale-103 text-white rounded flex items-center justify-center gap-2 font-bold text-lg"
+          className="px-4 py-2 bg-primary text-white rounded flex gap-2"
         >
-          <ThumbsUp></ThumbsUp> <span className="mt-1">{issue.upvoteCount || 0}</span>
+          <ThumbsUp /> {issue.upvoteCount || 0}
         </button>
-
-        {/* 👍  */}
 
         {user?.email === issue.email && (
           <button
-            disabled={issue.status !== "Pending"}
             onClick={() => setShowEditModal(true)}
-            className={`px-4 py-2 text-white rounded ${issue.status !== "Pending"
+            disabled={issue.status !== "Pending"}
+            className={`px-4 py-2 rounded text-white ${issue.status !== "Pending"
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-primary"
               }`}
@@ -214,9 +171,9 @@ const IssueDetails = () => {
 
         {user?.email === issue.email && (
           <button
-            disabled={issue.status !== "Pending"}
             onClick={handleDelete}
-            className={`px-4 py-2 text-white rounded ${issue.status !== "Pending"
+            disabled={issue.status !== "Pending"}
+            className={`px-4 py-2 rounded text-white ${issue.status !== "Pending"
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-red-600"
               }`}
@@ -228,26 +185,62 @@ const IssueDetails = () => {
         {user?.email === issue.email && (
           <button
             onClick={handlePayment}
-            disabled={issue.priority === "High" || boostMutation.isLoading}
-            className={`px-4 py-2 text-white rounded ${issue.priority === "High"
-                ? "bg-gray-400 cursor-not-allowed"
-                : boostMutation.isLoading
-                  ? "bg-purple-400 cursor-not-allowed"
-                  : "bg-purple-600"
+            disabled={issue.priority === "High"}
+            className={`px-4 py-2 rounded text-white ${issue.priority === "High"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-purple-600"
               }`}
           >
-            {issue.priority === "High"
-              ? "Already Boosted"
-              : boostMutation.isLoading
-                ? "Boosting..."
-                : "Boost (100 BDT)"}
+            {issue.priority === "High" ? "Already Boosted" : "Boost (100 BDT)"}
           </button>
         )}
-
-
       </div>
 
-      {/* EDIT MODAL */}
+      {/* ================= STAFF ASSIGNMENT ================= */}
+      <div className="mt-6 p-4 bg-base-200 rounded">
+        <h3 className="text-xl font-semibold mb-2">Assigned Staff</h3>
+
+        {issue.assignedStaff ? (
+          <div className="space-y-1">
+            <p><strong>Name:</strong> {issue.assignedStaff.name}</p>
+            <p><strong>Email:</strong> {issue.assignedStaff.email}</p>
+          </div>
+        ) : (
+          <p className="text-gray-500 italic">
+            No staff assigned to this issue yet.
+          </p>
+        )}
+      </div>
+
+      {/* ================= TIMELINE ================= */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-6">Issue Timeline</h2>
+
+        <div className="border-l-2 border-gray-300 pl-6 space-y-6">
+          {[...(issue.timeline || [])].reverse().map((item, index) => (
+            <div key={index} className="relative">
+              <span className="absolute -left-[11px] top-1 w-5 h-5 rounded-full bg-primary"></span>
+
+              <div className="bg-base-200 p-4 rounded-lg shadow">
+                <div className="flex justify-between mb-1">
+                  <span className="font-semibold">{item.status}</span>
+                  <span className="text-sm text-gray-500">
+                    {new Date(item.time).toLocaleString()}
+                  </span>
+                </div>
+
+                <p className="text-gray-700">{item.message}</p>
+
+                <p className="text-sm text-gray-500 mt-1">
+                  Updated by: {item.updatedBy}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ================= EDIT MODAL ================= */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <form
@@ -256,53 +249,45 @@ const IssueDetails = () => {
           >
             <h2 className="text-2xl font-bold">Edit Issue</h2>
 
-            <label className="font-medium">Title</label>
+            <label className="font-bold text-xl">Title</label>
             <input
               name="title"
               defaultValue={issue.title}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded mt-1"
               required
             />
-
-            <label className="font-medium">Photo</label>
+            <label className="font-bold text-xl">Category</label>
             <input
-              type="file"
-              onChange={(e) => handleImageUpload(e.target.files[0])}
-              className="w-full p-2 border rounded"
-            />
-
-            <label className="font-medium">Category</label>
-            <select
               name="category"
               defaultValue={issue.category}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded mt-1"
               required
-            >
-              <option value="Road">Road</option>
-              <option value="Electricity">Electricity</option>
-              <option value="Water">Water</option>
-              <option value="Garbage">Garbage</option>
-              <option value="Other">Other</option>
-            </select>
+            />
 
-            <label className="font-medium">Location</label>
+            <label className="font-bold text-xl">Location</label>
             <input
               name="location"
               defaultValue={issue.location}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded mt-1"
               required
             />
 
-            <label className="font-medium">Description</label>
+            <label className="font-bold text-xl">Image</label>
+            <input
+              type="file"
+              onChange={(e) => handleImageUpload(e.target.files[0])}
+              className="w-full p-2 border rounded mt-1"
+            />
+            <label className="font-bold text-xl">Description</label>
             <textarea
               name="description"
               defaultValue={issue.description}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded mt-1"
               rows="4"
               required
             />
 
-            <div className="flex justify-end gap-3 mt-4">
+            <div className="flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setShowEditModal(false)}
