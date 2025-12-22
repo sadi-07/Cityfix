@@ -1,16 +1,42 @@
-# React + Vite
+# City Fix
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A digital platform where citizens report real-world public infrastructure issues, enabling efficient management and resolution by government staff and administrators.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Admin Credentials
+- **Email:** admin@gmail.com
+- **Password:** Abcd12
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Live Site
+[View Live Site](https://cheery-alpaca-ae1361.netlify.app/)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Website Features
+
+1. **Citizen Reporting:** Users can report issues like broken streetlights, potholes, water leakage, garbage overflow, and damaged footpaths.  
+2. **Photo Uploads:** Citizens can attach photos to their reports for better verification.    
+3. **Admin Dashboard:** Admins can review, verify, and assign reported issues to staff.  
+4. **Staff Management:** Staff members can update the progress of assigned issues.  
+5. **Status Tracking:** Issues move through a structured workflow: Pending → In-Progress → Resolved → Closed.  
+6. **Real-Time Updates:** Citizens can track the status of their reports anytime.  
+7. **Priority Support:** Premium citizens receive faster attention to their reports.    
+8. **Transparency & Efficiency:** Reduces response time, improves accountability, and makes city service delivery more efficient.  
+9. **Secure Authentication:** Ensures safe login and access for citizens, staff, and admins.  
+10. **User-Friendly Interface:** Clean, responsive design for easy navigation on desktop and mobile.  
+
+---
+
+
+---
+
+## Technology Stack
+- **Frontend:** React, Tailwind CSS  
+- **Backend:** Node.js, Express
+- **Database:** MongoDB 
+- **Deployment:** Vercel/Netlify  
+
+---

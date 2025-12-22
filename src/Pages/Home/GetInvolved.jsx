@@ -19,10 +19,10 @@ const GetInvolved = () => {
           can make the city safer, cleaner, and more enjoyable for everyone.
         </p>
         <Link
-          to="/all-issues"
+          to="/dashboard"
           className="inline-block px-8 py-3 bg-primary text-white text-lg rounded-lg font-semibold shadow-md hover:bg-secondary transition"
         >
-          Report an Issue
+          Open Your Dashboard
         </Link>
       </motion.div>
 

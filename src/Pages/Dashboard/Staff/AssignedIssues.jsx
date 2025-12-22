@@ -32,7 +32,13 @@ const AssignedIssues = () => {
         console.error(err);
       }
     };
-    fetchIssues();
+
+    fetchIssues(); // initial fetch
+
+    // Polling: fetch every 5 seconds
+    const interval = setInterval(fetchIssues, 5000);
+
+    return () => clearInterval(interval); // cleanup on unmount
   }, [user.email]);
 
   // Filters
@@ -142,7 +148,7 @@ const AssignedIssues = () => {
 
                 {/* Dropdown */}
                 {openDropdown === issue._id &&
-                  issue.status !== "Closed" && // prevents dropdown when closed
+                  issue.status !== "Closed" &&
                   statusFlow[issue.status]?.length > 0 && (
                     <div className="absolute mt-2 bg-white shadow-lg border rounded p-2 z-10">
                       {statusFlow[issue.status].map((next) => (
@@ -157,11 +163,12 @@ const AssignedIssues = () => {
                     </div>
                   )}
 
-                  <Link to={`/issues/${issue._id}`}>
-                    <button className="px-3 py-1 rounded text-white bg-gray-800 cursor-pointer">View Details</button>
-                  </Link>
+                <Link to={`/issues/${issue._id}`}>
+                  <button className="px-3 py-1 rounded text-white bg-gray-800 cursor-pointer">
+                    View Details
+                  </button>
+                </Link>
               </td>
-
             </tr>
           ))}
         </tbody>

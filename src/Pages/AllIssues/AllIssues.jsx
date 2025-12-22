@@ -22,6 +22,10 @@ const AllIssues = () => {
   const backend = "https://city-fix-server-one.vercel.app";
   const queryClient = useQueryClient();
 
+  // 🔥 Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Show 6 issues per page
+
   // 🔥 Fetch all issues
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["issues"],
@@ -56,8 +60,14 @@ const AllIssues = () => {
       );
     }
 
-    // Sort: boosted/upvoted issues first
-    data.sort((a, b) => (b.upvoteCount || 0) - (a.upvoteCount || 0));
+    // Sort: boosted/high-priority issues first, then by upvoteCount
+    data.sort((a, b) => {
+      // Boosted/high-priority on top
+      if (a.priority === "High" && b.priority !== "High") return -1;
+      if (a.priority !== "High" && b.priority === "High") return 1;
+      // Then by upvoteCount
+      return (b.upvoteCount || 0) - (a.upvoteCount || 0);
+    });
 
     // Only set state if array changed
     setFilteredIssues((prev) => {
@@ -66,6 +76,9 @@ const AllIssues = () => {
       if (prevIds !== newIds) return data;
       return prev;
     });
+
+    // Reset to first page whenever filters/search change
+    setCurrentPage(1);
   }, [category, status, priority, debouncedSearch, issues]);
 
   // 🔥 Upvote Mutation
@@ -95,6 +108,14 @@ const AllIssues = () => {
   };
 
   if (isLoading) return <Loading />;
+
+  // 🔥 Pagination calculations
+  const totalPages = Math.ceil(filteredIssues.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentIssues = filteredIssues.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -146,8 +167,11 @@ const AllIssues = () => {
 
       {/* Issues List */}
       <div className="grid md:grid-cols-3 gap-6">
-        {filteredIssues.map((issue) => (
-          <div key={issue._id} className="shadow-lg border border-gray-400 rounded p-4 hover:scale-103 hover:shadow-xl transition">
+        {currentIssues.map((issue) => (
+          <div
+            key={issue._id}
+            className="shadow-lg border border-gray-400 rounded p-4 hover:scale-103 hover:shadow-xl transition"
+          >
             {issue.image && (
               <img
                 src={issue.image}
@@ -194,6 +218,39 @@ const AllIssues = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i + 1)}
+            className={`px-4 py-2 rounded ${
+              currentPage === i + 1 ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

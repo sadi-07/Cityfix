@@ -25,7 +25,11 @@ const LatestResolved = () => {
     );
   }
 
-  console.log(issues.length)
+  // 🔥 Ensure latest resolved issues appear first and only take 6
+  const latestIssues = [...issues]
+    .filter((i) => i.status === "Closed") // only resolved issues
+    .sort((a, b) => new Date(b.resolvedAt || b.updatedAt || b.createdAt) - new Date(a.resolvedAt || a.updatedAt || a.createdAt)) // newest first
+    .slice(0, 6); // keep only 6
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-16">
@@ -34,16 +38,18 @@ const LatestResolved = () => {
       </h2>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {issues.map((issue) => (
+        {latestIssues.map((issue) => (
           <div
             key={issue._id}
             className="bg-gray-100 rounded-lg shadow hover:shadow-lg border border-primary/30 transition"
           >
-            <img
-              src={issue.image}
-              alt={issue.title}
-              className="w-full h-48 object-cover rounded-t-lg"
-            />
+            {issue.image && (
+              <img
+                src={issue.image}
+                alt={issue.title}
+                className="w-full h-48 object-cover rounded-t-lg"
+              />
+            )}
 
             <div className="p-5 space-y-2">
               <h3 className="text-2xl font-bold line-clamp-1">
