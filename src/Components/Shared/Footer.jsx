@@ -14,7 +14,7 @@ const Footer = () => {
 
     return (
         <footer className="bg-gray-900 text-white px-6 lg:px-20 py-16">
-            {/* Logo & Tagline */}
+            
             <motion.div
                 className="text-center mb-12"
                 initial={{ opacity: 0, y: 50 }}
@@ -22,18 +22,18 @@ const Footer = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
             >
-                {/* Logo Placeholder */}
+                
                 <Link to="/" className="mx-auto h-20 w-60">
                     <img className="h-20 w-50 mx-auto" src={logoWhite} alt="" />
                 </Link>
 
-                {/* Tagline */}
+                
                 <p className="text-gray-300 max-w-sm mx-auto text-lg my-5">
                     Your city, cleaner, safer, smarter, together we make it better today.
                 </p>
             </motion.div>
 
-            {/* Links Section */}
+            
             <motion.div
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12"
                 initial={{ opacity: 0 }}

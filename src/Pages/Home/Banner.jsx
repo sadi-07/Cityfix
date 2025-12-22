@@ -71,7 +71,7 @@ const Banner = () => {
                 </motion.div>
             </motion.div>
 
-            {/* RIGHT SIDE: SLIDER */}
+            {/* RIGHT SIDE */}
             <div
                 className="w-full lg:w-1/2 mt-10 lg:mt-0"
                 data-aos="fade-left"

@@ -9,7 +9,7 @@ const backend = "https://city-fix-server-one.vercel.app";
 const StaffDashboard = () => {
   const { user } = useContext(AuthContext);
 
-  // Fetch assigned issues
+ 
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["assignedIssues", user?.email],
     queryFn: async () => {
@@ -20,7 +20,7 @@ const StaffDashboard = () => {
 
   if (isLoading) return <Loading></Loading>;
 
-  // Stats
+  
   const assignedCount = issues.length;
   const resolvedCount = issues.filter(i => i.status === "Closed").length;
   const todayTasks = issues.filter(i => {
@@ -33,7 +33,7 @@ const StaffDashboard = () => {
       {/* Header */}
       <h1 className="text-3xl font-bold">Staff Dashboard</h1>
 
-      {/* ====== Stats Cards ====== */}
+      
       <div className="grid md:grid-cols-3 gap-6">
         <div className="p-5 bg-white shadow rounded-lg">
           <h2 className="text-xl font-semibold">Assigned Issues</h2>
@@ -55,7 +55,7 @@ const StaffDashboard = () => {
         </div>
       </div>
 
-      {/* ====== Basic Bar Chart (PURE CSS) ====== */}
+      
       <div className="p-6 bg-white shadow rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Weekly Workload</h2>
 
@@ -80,7 +80,7 @@ const StaffDashboard = () => {
         </div>
       </div>
 
-      {/* ====== Today’s Tasks List ====== */}
+      
       <div className="p-6 bg-white shadow rounded-lg">
         <h2 className="text-xl font-semibold mb-3">Tasks for Today</h2>
 

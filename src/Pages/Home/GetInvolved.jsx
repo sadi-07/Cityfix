@@ -27,7 +27,7 @@ const GetInvolved = () => {
       </motion.div>
 
       <motion.img
-        src={cleanImage} // Replace with a relevant image from your assets
+        src={cleanImage}
         alt="City cleanup"
         className="lg:w-1/2 rounded-xl shadow-lg"
         initial={{ x: 50, opacity: 0 }}

@@ -43,13 +43,13 @@ const Register = () => {
 
             const imageURL = await imageUpload(imageFile);
 
-            // Firebase create user
+            
             const result = await createUser(email, password);
 
-            // Update profile
+            
             await updateUserProfile(name, imageURL, "citizen");
 
-            // Save user to MongoDB
+            
             await axios.post("https://city-fix-server-one.vercel.app/users", {
                 name,
                 email,
@@ -58,7 +58,7 @@ const Register = () => {
                 createdAt: new Date()
             });
 
-            // Success
+            
             toast.success("Signup Successful!");
             navigate(from, { replace: true });
 
@@ -66,37 +66,37 @@ const Register = () => {
         } catch (err) {
             console.log("Registration Error:", err);
 
-            // Firebase: email already registered
+            
             if (err.code === "auth/email-already-in-use") {
                 toast.error("This email is already registered!");
                 return;
             }
 
-            // Firebase: weak password
+            
             if (err.code === "auth/weak-password") {
                 toast.error("Password must be at least 6 characters.");
                 return;
             }
 
-            // Firebase: invalid email format
+            
             if (err.code === "auth/invalid-email") {
                 toast.error("Invalid email format.");
                 return;
             }
 
-            // Axios: server responded with an error
+            
             if (err.response && err.response.data) {
                 toast.error(err.response.data?.error?.message || "Image upload failed!");
                 return;
             }
 
-            // Axios: Network issues
+            
             if (err.message === "Network Error") {
                 toast.error("Network error. Please check your internet.");
                 return;
             }
 
-            // Default fallback
+            
             toast.error("Something went wrong. Try again.");
         }
         finally {
@@ -111,13 +111,13 @@ const Register = () => {
 
             const user = result.user;
 
-            // Update profile (Google already provides name & photo)
+            
             await updateUserProfile(
                 user.displayName,
                 user.photoURL
             );
 
-            // Save Google user to MongoDB
+            
             await axios.post("https://city-fix-server-one.vercel.app/users", {
                 name: user.displayName,
                 email: user.email,

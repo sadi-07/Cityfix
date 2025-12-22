@@ -10,16 +10,15 @@ const backend = "https://city-fix-server-one.vercel.app";
 const ManageUsers = () => {
   const queryClient = useQueryClient();
 
-  // Load all users
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["allUsers"],
     queryFn: async () => {
       const res = await axios.get(`${backend}/users`);
-      return res.data.filter((u) => u.role === "citizen"); // only citizens
+      return res.data.filter((u) => u.role === "citizen"); 
     },
   });
 
-  // Block / Unblock mutation
+  
   const toggleBlockMutation = useMutation({
     mutationFn: async ({ email, status }) => {
       const res = await axios.patch(`${backend}/users/block/${email}`, {

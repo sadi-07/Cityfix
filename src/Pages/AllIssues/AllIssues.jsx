@@ -22,11 +22,9 @@ const AllIssues = () => {
   const backend = "https://city-fix-server-one.vercel.app";
   const queryClient = useQueryClient();
 
-  // 🔥 Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Show 6 issues per page
-
-  // 🔥 Fetch all issues
+  const itemsPerPage = 9;
+  
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["issues"],
     queryFn: async () => {
@@ -35,16 +33,16 @@ const AllIssues = () => {
     },
   });
 
-  // 🔥 Debounce search input
+  
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
-    }, 300); // 300ms debounce
+    }, 300); 
 
     return () => clearTimeout(handler);
   }, [search]);
 
-  // 🔥 FILTER + SORT
+  
   useEffect(() => {
     if (!issues) return;
 
@@ -60,16 +58,16 @@ const AllIssues = () => {
       );
     }
 
-    // Sort: boosted/high-priority issues first, then by upvoteCount
+    
     data.sort((a, b) => {
-      // Boosted/high-priority on top
+      
       if (a.priority === "High" && b.priority !== "High") return -1;
       if (a.priority !== "High" && b.priority === "High") return 1;
-      // Then by upvoteCount
+      
       return (b.upvoteCount || 0) - (a.upvoteCount || 0);
     });
 
-    // Only set state if array changed
+    
     setFilteredIssues((prev) => {
       const prevIds = prev.map((i) => i._id).join(",");
       const newIds = data.map((i) => i._id).join(",");
@@ -77,11 +75,11 @@ const AllIssues = () => {
       return prev;
     });
 
-    // Reset to first page whenever filters/search change
+    
     setCurrentPage(1);
   }, [category, status, priority, debouncedSearch, issues]);
 
-  // 🔥 Upvote Mutation
+  
   const upvoteMutation = useMutation({
     mutationFn: async (issue) => {
       if (!user) return navigate("/login");
@@ -109,7 +107,7 @@ const AllIssues = () => {
 
   if (isLoading) return <Loading />;
 
-  // 🔥 Pagination calculations
+  
   const totalPages = Math.ceil(filteredIssues.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentIssues = filteredIssues.slice(
@@ -121,7 +119,7 @@ const AllIssues = () => {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold mb-6">All Issues</h1>
 
-      {/* Filters */}
+      
       <div className="flex gap-4 mb-6 flex-wrap">
         <select
           className="p-2 border rounded"
@@ -225,7 +223,7 @@ const AllIssues = () => {
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer rounded disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Prev
         </button>
@@ -235,8 +233,8 @@ const AllIssues = () => {
             key={i}
             onClick={() => setCurrentPage(i + 1)}
             className={`px-4 py-2 rounded ${
-              currentPage === i + 1 ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
+              currentPage === i + 1 ? "bg-primary text-white" : "bg-gray-300"
+            } cursor-pointer`}
           >
             {i + 1}
           </button>
@@ -247,7 +245,7 @@ const AllIssues = () => {
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
           disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next
         </button>

@@ -145,9 +145,6 @@ const IssueDetails = () => {
         <p><strong>Description:</strong> {issue.description}</p>
       </div>
 
-
-
-      {/* ================= ACTION BUTTONS ================= */}
       <div className="flex gap-4 mt-6 flex-wrap">
         <button
           onClick={handleUpvote}
@@ -196,7 +193,7 @@ const IssueDetails = () => {
         )}
       </div>
 
-      {/* ================= STAFF ASSIGNMENT ================= */}
+      
       <div className="mt-6 p-4 bg-base-200 rounded">
         <h3 className="text-xl font-semibold mb-2">Assigned Staff</h3>
 
@@ -212,7 +209,7 @@ const IssueDetails = () => {
         )}
       </div>
 
-      {/* ================= TIMELINE ================= */}
+      
       <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">Issue Timeline</h2>
 

@@ -1,12 +1,13 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import Loading from "../../../Components/Shared/Loading";
 
 const backend = "https://city-fix-server-one.vercel.app";
 
 const AdminDashboard = () => {
-  // Fetch statistics
-  const { data: stats = {} } = useQuery({
+  
+  const { data: stats = {}, isLoading: loadingStats } = useQuery({
     queryKey: ["adminStats"],
     queryFn: async () => {
       const res = await axios.get(`${backend}/admin/stats`);
@@ -14,8 +15,8 @@ const AdminDashboard = () => {
     },
   });
 
-  // Latest 5 issues
-  const { data: latestIssues = [] } = useQuery({
+  
+  const { data: latestIssues = [], isLoading: loadingIssues } = useQuery({
     queryKey: ["latestIssues"],
     queryFn: async () => {
       const res = await axios.get(`${backend}/admin/latest-issues`);
@@ -23,8 +24,8 @@ const AdminDashboard = () => {
     },
   });
 
-  // Latest 5 payments
-  const { data: latestPayments = [] } = useQuery({
+  
+  const { data: latestPayments = [], isLoading: loadingPayments } = useQuery({
     queryKey: ["latestPayments"],
     queryFn: async () => {
       const res = await axios.get(`${backend}/admin/latest-payments`);
@@ -32,8 +33,8 @@ const AdminDashboard = () => {
     },
   });
 
-  // Latest 5 users
-  const { data: latestUsers = [] } = useQuery({
+  
+  const { data: latestUsers = [], isLoading: loadingUsers } = useQuery({
     queryKey: ["latestUsers"],
     queryFn: async () => {
       const res = await axios.get(`${backend}/admin/latest-users`);
@@ -41,12 +42,9 @@ const AdminDashboard = () => {
     },
   });
 
-  console.log(stats)
-  console.log(stats.pendingIssues)
-  console.log(stats.totalIssues)
-  console.log(stats.boostedIssues) ///
-  console.log(stats.totalUsers)
-  console.log(stats.totalPayments)
+  
+  const isLoading = loadingStats || loadingIssues || loadingPayments || loadingUsers;
+  if (isLoading) return <Loading />;
 
   return (
     <div className="p-6 space-y-10">
@@ -54,25 +52,21 @@ const AdminDashboard = () => {
 
       {/* ====================== STATS CARDS ====================== */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
         <Card title="Total Issues" value={stats.totalIssues} color="bg-blue-700" />
         <Card title="Pending Issues" value={stats.pendingIssues} color="bg-yellow-700" />
         <Card title="Resolved Issues" value={stats.closed} color="bg-green-700" />
-        {/* <Card title="Rejected Issues" value={stats.rejectedIssues} color="bg-red-700" /> */}
         <Card title="Boosted Issues" value={stats.boostedIssues} color="bg-purple-700" />
         <Card title="Total Users" value={stats.totalUsers} color="bg-indigo-700" />
         <Card title="Total Payments (৳)" value={stats.totalPayments} color="bg-emerald-700" />
-
       </div>
 
-
-      {/* Latest Issues */}
+      
       <Section title="Latest Issues" data={latestIssues} fields={["title", "status", "priority"]} />
 
-      {/* Latest Payments */}
+      
       <Section title="Latest Payments" data={latestPayments} fields={["email", "amount"]} />
 
-      {/* Latest Users */}
+      
       <Section title="Latest Users" data={latestUsers} fields={["name", "email"]} />
     </div>
   );
@@ -85,7 +79,6 @@ const Card = ({ title, value, color }) => (
     <p className="text-4xl font-bold">{value ?? 0}</p>
   </div>
 );
-
 
 // ======================= TABLE SECTION =======================
 const Section = ({ title, data, fields }) => (
@@ -104,9 +97,7 @@ const Section = ({ title, data, fields }) => (
           {data.map((item, i) => (
             <tr key={i} className="border-t">
               {fields.map((f) => (
-                <td key={f} className="p-2">
-                  {item[f]}
-                </td>
+                <td key={f} className="p-2">{item[f]}</td>
               ))}
             </tr>
           ))}

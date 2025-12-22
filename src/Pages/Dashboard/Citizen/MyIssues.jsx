@@ -18,9 +18,9 @@ const MyIssues = () => {
     search: "",
   });
 
-  const [editIssue, setEditIssue] = useState(null); // issue to edit
+  const [editIssue, setEditIssue] = useState(null);
 
-  // Fetch issues for logged-in user
+  
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["myIssues", user?.email],
     queryFn: async () => {
@@ -31,7 +31,7 @@ const MyIssues = () => {
     enabled: !!user?.email,
   });
 
-  // Delete issue mutation
+  
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       await axios.delete(`${backend}/issues/${id}`);
@@ -61,7 +61,7 @@ const MyIssues = () => {
 
   if (isLoading) return <Loading />
 
-  // Apply filters
+  
   let filtered = [...issues];
   if (filters.status) filtered = filtered.filter((i) => i.status === filters.status);
   if (filters.category) filtered = filtered.filter((i) => i.category === filters.category);

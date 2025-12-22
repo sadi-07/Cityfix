@@ -10,7 +10,7 @@ export const imageUpload = async (imageFile) => {
             formData
         );
 
-        // imgBB ONLY returns this as the hosted image URL
+        
         return res.data.data.display_url;
 
     } catch (err) {

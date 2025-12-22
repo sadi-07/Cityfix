@@ -19,7 +19,7 @@ const ReportIssue = () => {
 
   const { register, handleSubmit, reset } = useForm();
 
-  // ================= FETCH FULL USER FROM DB =================
+  
   useEffect(() => {
     const fetchUser = async () => {
       if (!user?.email) return;
@@ -39,7 +39,7 @@ const ReportIssue = () => {
     fetchUser();
   }, [user?.email]);
 
-  // ================= FETCH USER ISSUE COUNT =================
+  
   useEffect(() => {
     if (!user?.email) return;
 
@@ -49,7 +49,7 @@ const ReportIssue = () => {
       .catch(() => {});
   }, [user?.email]);
 
-  // ================= LOADER =================
+  
   if (userLoading || !dbUser) {
     return <Loading />;
   }
@@ -57,7 +57,7 @@ const ReportIssue = () => {
   const isFreeUser = !dbUser.subscription?.status;
   const limitReached = isFreeUser && issueCount >= 3;
 
-  // ================= SUBMIT HANDLER =================
+  
   const onSubmit = async (data) => {
     if (limitReached) {
       return toast.error("Issue limit reached! Upgrade to Premium.");
@@ -102,7 +102,7 @@ const ReportIssue = () => {
     }
   };
 
-  // ================= UI =================
+  
   return (
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-6">Report an Issue</h1>

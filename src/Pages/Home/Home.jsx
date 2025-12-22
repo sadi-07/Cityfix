@@ -11,7 +11,7 @@ const Home = () => {
     return (
         <div>
             <Banner></Banner>
-            {/* latest resolved section */}
+            
             <LatestResolved></LatestResolved>
             <Features></Features>
             <HowItWorks></HowItWorks>

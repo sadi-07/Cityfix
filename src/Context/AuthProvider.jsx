@@ -23,7 +23,7 @@ const AuthProvider = ({ children }) => {
 
   const backendURL = "https://city-fix-server-one.vercel.app";
 
-  // CREATE USER
+  
   const createUser = async (email, password) => {
   //setLoading(true);
   try {
@@ -31,7 +31,7 @@ const AuthProvider = ({ children }) => {
     return result;
   } catch (err) {
     setLoading(false);
-    throw err; // bubble error to Register.jsx
+    throw err; 
   }
 };
 
@@ -43,7 +43,7 @@ const AuthProvider = ({ children }) => {
     await updateProfile(auth.currentUser, { displayName: name, photoURL });
     await auth.currentUser.reload();
 
-    // 🔥 FIX: Update local user object
+    
     setUser({ ...auth.currentUser, role });
   };
 
@@ -77,11 +77,11 @@ const AuthProvider = ({ children }) => {
   const loadUserFromDB = async (uid) => {
     try {
       const res = await fetch(`${backendURL}/users/${uid}`);
-      if (!res.ok) return; // if user not in DB yet
+      if (!res.ok) return; 
 
       const dbUser = await res.json();
 
-      // 🔥 Combine Firebase user + MongoDB user
+      
       setUser({
         ...auth.currentUser,
         role: dbUser.role,
@@ -103,7 +103,7 @@ const AuthProvider = ({ children }) => {
         const res = await fetch(`https://city-fix-server-one.vercel.app/users/${currentUser.email}`);
         const dbUser = await res.json();
 
-        // Merge Firebase + MongoDB user
+        
         setUser({
           ...currentUser,
           role: dbUser.role || "citizen",

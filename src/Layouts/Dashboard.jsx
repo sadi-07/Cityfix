@@ -4,7 +4,7 @@ import logoWhite from "../assets/logo-white-removebg-preview.png";
 import { AuthContext } from "../Context/AuthProvider";
 import { Banknote, Contact, FolderOpen, LayoutDashboard, ListTodo, MessageSquareWarning, ReceiptText, UserCircle, UsersRound, Menu } from "lucide-react";
 
-// Import dashboards
+
 import AdminDashboard from "../Pages/Dashboard/Admin/AdminDashboard";
 import CitizenDashboard from "../Pages/Dashboard/Citizen/CitizenDashboard";
 import StaffDashboard from "../Pages/Dashboard/Staff/StaffDashboard";
@@ -15,7 +15,7 @@ const Dashboard = () => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Function to auto-select dashboard home content
+  
   const renderDashboardHome = () => {
     if (location.pathname !== "/dashboard") return null;
 
@@ -26,7 +26,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex bg-gray-100">
-      {/* Sidebar for lg+ screens */}
+      
       <aside className="w-64 bg-gray-900 text-white p-5 hidden lg:block">
         <Link to="/">
           <img className="h-18 w-45 mx-auto mb-10" src={logoWhite} alt="" />
@@ -160,7 +160,7 @@ const Dashboard = () => {
             <h1 className="text-3xl font-extrabold text-gray-950">Dashboard Panel</h1>
           </div>
 
-          {/* Desktop title */}
+          
           <h1 className="hidden lg:block text-4xl font-extrabold text-gray-950">
             Dashboard Panel
           </h1>
@@ -181,7 +181,7 @@ const Dashboard = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-gray-900 text-white p-4">
             <nav className="flex flex-col gap-2">
-              {/* Render all nav links same as sidebar */}
+              
               {user?.role === "citizen" && (
                 <>
                   <NavLink
@@ -287,7 +287,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Dashboard Home + Nested Pages */}
+        
         <main className="p-6">
           {renderDashboardHome()}
           <Outlet />

@@ -34,6 +34,7 @@ const CitizenDashboard = () => {
     queryKey: ["citizenPayments", user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
+      
       const res = await fetch(`${backend}/payments?email=${user.email}`);
       return res.json();
     },

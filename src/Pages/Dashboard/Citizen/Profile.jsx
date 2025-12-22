@@ -18,7 +18,7 @@ const Profile = () => {
 
   
 
-  console.log(user);
+  //console.log(user);
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -72,7 +72,6 @@ const Profile = () => {
     }
   };
 
-  // Handle subscription via Stripe
   const handleSubscribe = async () => {
     try {
       const res = await fetch(`${backend}/create-checkout-session`, {
@@ -85,7 +84,7 @@ const Profile = () => {
       });
 
       const data = await res.json();
-      window.location.href = data.url; // redirect to Stripe checkout
+      window.location.href = data.url;
     } catch (err) {
       toast.error("Payment failed");
     }
@@ -130,7 +129,7 @@ const Profile = () => {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">My Profile</h1>
 
-      {/* BLOCKED WARNING */}
+      
       {user.blocked && (
         <div className="bg-red-100 border border-red-400 text-red-800 p-4 rounded mb-6">
           Your account is blocked. Please contact authorities for assistance.
@@ -148,7 +147,7 @@ const Profile = () => {
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
 
-            {/* PREMIUM BADGE */}
+            
             {user.premium && (
               <span className="bg-yellow-300 text-yellow-800 text-sm font-semibold px-2 py-1 rounded">
                 Premium
@@ -168,7 +167,7 @@ const Profile = () => {
             Edit Profile
           </button>
 
-          {/* Subscribe Button - hide if already premium */}
+          
           {!user.premium && !user.blocked && (
             <button
               onClick={handleSubscribe}

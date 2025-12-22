@@ -21,7 +21,7 @@ const AssignedIssues = () => {
   const [priorityFilter, setPriorityFilter] = useState("");
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  // Fetch assigned issues
+  
   useEffect(() => {
     const fetchIssues = async () => {
       try {
@@ -33,22 +33,22 @@ const AssignedIssues = () => {
       }
     };
 
-    fetchIssues(); // initial fetch
+    fetchIssues();
 
-    // Polling: fetch every 5 seconds
+    
     const interval = setInterval(fetchIssues, 5000);
 
-    return () => clearInterval(interval); // cleanup on unmount
+    return () => clearInterval(interval);
   }, [user.email]);
 
-  // Filters
+  
   useEffect(() => {
     let data = [...issues];
 
     if (statusFilter) data = data.filter((i) => i.status === statusFilter);
     if (priorityFilter) data = data.filter((i) => i.priority === priorityFilter);
 
-    // Show High priority issues first
+    
     data.sort((a, b) =>
       a.priority === "High" && b.priority !== "High"
         ? -1
@@ -68,7 +68,7 @@ const AssignedIssues = () => {
         updatedBy: user.email,
       });
 
-      // Update UI instantly
+      
       setIssues((prev) =>
         prev.map((i) => (i._id === issueId ? { ...i, ...res.data } : i))
       );
@@ -131,7 +131,7 @@ const AssignedIssues = () => {
               <td className="border px-4 py-2">{issue.priority}</td>
 
               <td className="border px-4 py-2 relative flex items-center justify-around">
-                {/* Toggle Button */}
+                
                 <button
                   className={`px-3 py-1 rounded text-white ${issue.status === "Closed"
                       ? "bg-gray-400 cursor-not-allowed"

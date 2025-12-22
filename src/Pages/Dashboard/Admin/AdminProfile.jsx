@@ -34,7 +34,7 @@ const AdminProfile = () => {
   try {
     let photoURL = user.photoURL;
 
-    // upload image if selected
+    
     if (data.image && data.image[0]) {
       photoURL = await imageUpload(data.image[0]);
     }

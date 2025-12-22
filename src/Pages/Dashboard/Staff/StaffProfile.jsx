@@ -34,7 +34,7 @@ const StaffProfile = () => {
   try {
     let photoURL = user.photoURL;
 
-    // upload image if selected
+    
     if (data.image && data.image[0]) {
       photoURL = await imageUpload(data.image[0]);
     }
@@ -63,7 +63,7 @@ const StaffProfile = () => {
 };
 
 
-  console.log(user)
+  //console.log(user)
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">Staff Profile</h1>

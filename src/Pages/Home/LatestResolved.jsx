@@ -25,11 +25,11 @@ const LatestResolved = () => {
     );
   }
 
-  // 🔥 Ensure latest resolved issues appear first and only take 6
+  
   const latestIssues = [...issues]
-    .filter((i) => i.status === "Closed") // only resolved issues
-    .sort((a, b) => new Date(b.resolvedAt || b.updatedAt || b.createdAt) - new Date(a.resolvedAt || a.updatedAt || a.createdAt)) // newest first
-    .slice(0, 6); // keep only 6
+    .filter((i) => i.status === "Closed")
+    .sort((a, b) => new Date(b.resolvedAt || b.updatedAt || b.createdAt) - new Date(a.resolvedAt || a.updatedAt || a.createdAt))
+    .slice(0, 6); 
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-16">

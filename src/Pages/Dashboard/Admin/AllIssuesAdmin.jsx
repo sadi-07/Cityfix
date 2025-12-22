@@ -12,7 +12,7 @@ const AllIssuesAdmin = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState("");
 
-  // ⭐ FIXED — Correct backend route
+  
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["all-issues"],
     queryFn: async () => {
@@ -21,7 +21,7 @@ const AllIssuesAdmin = () => {
     },
   });
 
-  // ⭐ Fetch staff
+  
   const { data: staffList = [] } = useQuery({
     queryKey: ["staff"],
     queryFn: async () => {
@@ -30,8 +30,7 @@ const AllIssuesAdmin = () => {
     },
   });
 
-  // ⭐ Assign Staff Mutation
-  // ⭐ Assign Staff Mutation (Final Working)
+  
   const assignStaffMutation = useMutation({
     mutationFn: async ({ issueId, staffId }) => {
       const res = await fetch(
@@ -52,7 +51,7 @@ const AllIssuesAdmin = () => {
   });
 
 
-  // ⭐ Reject issue Mutation
+  
   const rejectMutation = useMutation({
     mutationFn: async (id) => {
       const res = await fetch(`https://city-fix-server-one.vercel.app/issues/reject/${id}`, {
@@ -62,7 +61,7 @@ const AllIssuesAdmin = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["all-issues"]);
-      queryClient.invalidateQueries(["my-issues"]); // citizen page also updates
+      queryClient.invalidateQueries(["my-issues"]); 
       Swal.fire("Rejected!", "The issue has been deleted.", "success");
     },
   });
@@ -70,7 +69,7 @@ const AllIssuesAdmin = () => {
 
   if (isLoading) return <Loading />;
 
-  // ⭐ Correct sorting logic
+  
   const sortedIssues = [...issues].sort((a, b) => {
     const aHigh = a.priority === "High";
     const bHigh = b.priority === "High";
@@ -79,7 +78,7 @@ const AllIssuesAdmin = () => {
     return 0;
   });
 
-  console.log(sortedIssues);
+  //console.log(sortedIssues);
 
   return (
     <div>

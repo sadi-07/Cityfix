@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../../Utils";
+import Loading from "../../../Components/Shared/Loading";
 
 const backend = "https://city-fix-server-one.vercel.app";
 
@@ -16,7 +17,7 @@ const ManageStaff = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editStaff, setEditStaff] = useState(null);
 
-  // Load all staff
+ 
   const { data: staff = [], isLoading } = useQuery({
     queryKey: ["staff"],
     queryFn: async () => {
@@ -138,7 +139,7 @@ const ManageStaff = () => {
     });
   };
 
-  if (isLoading) return <p>Loading staff...</p>;
+  if (isLoading) return <Loading />;
 
   return (
     <div>
