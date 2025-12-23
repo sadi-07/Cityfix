@@ -19,7 +19,6 @@ const ReportIssue = () => {
 
   const { register, handleSubmit, reset } = useForm();
 
-  
   useEffect(() => {
     const fetchUser = async () => {
       if (!user?.email) return;
@@ -39,7 +38,6 @@ const ReportIssue = () => {
     fetchUser();
   }, [user?.email]);
 
-  
   useEffect(() => {
     if (!user?.email) return;
 
@@ -49,18 +47,21 @@ const ReportIssue = () => {
       .catch(() => {});
   }, [user?.email]);
 
-  
   if (userLoading || !dbUser) {
     return <Loading />;
   }
 
   const isFreeUser = !dbUser.subscription?.status;
   const limitReached = isFreeUser && issueCount >= 3;
+  const isBlocked = dbUser.blocked; // ✅ check if blocked
 
-  
   const onSubmit = async (data) => {
     if (limitReached) {
       return toast.error("Issue limit reached! Upgrade to Premium.");
+    }
+
+    if (isBlocked) {
+      return toast.error("You are blocked and cannot report issues.");
     }
 
     setSubmitLoading(true);
@@ -102,12 +103,18 @@ const ReportIssue = () => {
     }
   };
 
-  
   return (
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-6">Report an Issue</h1>
 
-      {/* FREE USER WARNING */}
+      
+      {isBlocked && (
+        <div className="bg-red-100 border border-red-400 text-red-800 p-4 rounded mb-6">
+          Your account is blocked. You cannot report issues.
+        </div>
+      )}
+
+      
       {limitReached && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 p-4 rounded mb-6">
           You reached your free limit (3 issues).
@@ -130,7 +137,7 @@ const ReportIssue = () => {
           <input
             {...register("title", { required: true })}
             className="w-full border p-2 rounded mt-1"
-            disabled={limitReached}
+            disabled={limitReached || isBlocked} 
             required
           />
         </div>
@@ -141,7 +148,7 @@ const ReportIssue = () => {
           <textarea
             {...register("description", { required: true })}
             className="w-full border p-2 rounded mt-1 h-28"
-            disabled={limitReached}
+            disabled={limitReached || isBlocked} 
             required
           />
         </div>
@@ -152,7 +159,7 @@ const ReportIssue = () => {
           <select
             {...register("category", { required: true })}
             className="w-full border p-2 rounded mt-1"
-            disabled={limitReached}
+            disabled={limitReached || isBlocked} 
             required
           >
             <option value="">Select Category</option>
@@ -172,7 +179,7 @@ const ReportIssue = () => {
             accept="image/*"
             {...register("imageFile")}
             className="w-full border p-2 rounded mt-1"
-            disabled={limitReached}
+            disabled={limitReached || isBlocked} 
           />
         </div>
 
@@ -182,7 +189,7 @@ const ReportIssue = () => {
           <input
             {...register("location", { required: true })}
             className="w-full border p-2 rounded mt-1"
-            disabled={limitReached}
+            disabled={limitReached || isBlocked} 
             required
           />
         </div>
@@ -190,9 +197,9 @@ const ReportIssue = () => {
         {/* SUBMIT */}
         <button
           type="submit"
-          disabled={submitLoading || limitReached}
+          disabled={submitLoading || limitReached || isBlocked} 
           className={`w-full py-3 text-white rounded font-bold text-xl ${
-            limitReached ? "bg-gray-400" : "btn-btn"
+            limitReached || isBlocked ? "bg-gray-400" : "btn-btn"
           }`}
         >
           {submitLoading ? "Submitting..." : "Submit Issue"}

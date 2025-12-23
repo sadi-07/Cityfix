@@ -15,11 +15,6 @@ const Profile = () => {
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [userLoading, setUserLoading] = useState(true);
 
-
-  
-
-  //console.log(user);
-
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       name: "",
@@ -27,11 +22,12 @@ const Profile = () => {
     },
   });
 
+  // ✅ Show blocked modal once user data is fully loaded
   useEffect(() => {
-    if (user?.blocked === true) {
+    if (!userLoading && user?.blocked) {
       setShowBlockedModal(true);
     }
-  }, [user]);
+  }, [user, userLoading]);
 
   useEffect(() => {
     if (user) {
@@ -42,7 +38,6 @@ const Profile = () => {
     }
   }, [user, reset]);
 
-  // Update profile handler
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -91,45 +86,41 @@ const Profile = () => {
   };
 
   useEffect(() => {
-  const fetchUser = async () => {
-    if (!user?.email) return;
+    const fetchUser = async () => {
+      if (!user?.email) return;
 
-    try {
-      setUserLoading(true);
+      try {
+        setUserLoading(true);
 
-      const res = await fetch(`${backend}/users/${user.email}`);
-      const updatedUser = await res.json();
+        const res = await fetch(`${backend}/users/${user.email}`);
+        const updatedUser = await res.json();
 
-      setUser((prev) => ({
-        ...prev,
-        ...updatedUser,
-      }));
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-    } finally {
-      setUserLoading(false);
-    }
-  };
+        setUser((prev) => ({
+          ...prev,
+          ...updatedUser,
+        }));
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      } finally {
+        setUserLoading(false);
+      }
+    };
 
-  fetchUser();
-}, [user?.email, setUser]);
-
-
+    fetchUser();
+  }, [user?.email, setUser]);
 
   if (!user) {
     return <p className="text-center mt-10 text-gray-500">Loading...</p>;
   }
 
   if (!user || userLoading) {
-  return <Loading />;
-}
-
+    return <Loading />;
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">My Profile</h1>
 
-      
       {user.blocked && (
         <div className="bg-red-100 border border-red-400 text-red-800 p-4 rounded mb-6">
           Your account is blocked. Please contact authorities for assistance.
@@ -147,7 +138,6 @@ const Profile = () => {
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
 
-            
             {user.premium && (
               <span className="bg-yellow-300 text-yellow-800 text-sm font-semibold px-2 py-1 rounded">
                 Premium
@@ -167,7 +157,6 @@ const Profile = () => {
             Edit Profile
           </button>
 
-          
           {!user.premium && !user.blocked && (
             <button
               onClick={handleSubscribe}

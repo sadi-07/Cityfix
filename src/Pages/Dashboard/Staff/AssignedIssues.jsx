@@ -1,4 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 import { AuthContext } from "../../../Context/AuthProvider";
 import axios from "axios";
 import { Link } from "react-router";
@@ -20,65 +26,93 @@ const AssignedIssues = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  
+  // 🔒 prevents double fetch in React 18 StrictMode
+  const hasFetched = useRef(false);
+
+  // ✅ fetch issues
+  const fetchIssues = useCallback(async () => {
+    if (!user?.email) return;
+
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${backend}/issues/assigned/${user.email}`
+      );
+      setIssues(res.data);
+      setFilteredIssues(res.data);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load assigned issues");
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.email]);
+
+  // ✅ initial load (runs once only)
   useEffect(() => {
-    const fetchIssues = async () => {
-      try {
-        const res = await axios.get(`${backend}/issues/assigned/${user.email}`);
-        setIssues(res.data);
-        setFilteredIssues(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
+    if (hasFetched.current) return;
+    hasFetched.current = true;
     fetchIssues();
+  }, [fetchIssues]);
 
-    
-    const interval = setInterval(fetchIssues, 5000);
-
-    return () => clearInterval(interval);
-  }, [user.email]);
-
-  
+  // ✅ filters (unchanged)
   useEffect(() => {
     let data = [...issues];
 
-    if (statusFilter) data = data.filter((i) => i.status === statusFilter);
-    if (priorityFilter) data = data.filter((i) => i.priority === priorityFilter);
+    if (statusFilter) data = data.filter(i => i.status === statusFilter);
+    if (priorityFilter) data = data.filter(i => i.priority === priorityFilter);
 
-    
     data.sort((a, b) =>
       a.priority === "High" && b.priority !== "High"
         ? -1
         : b.priority === "High" && a.priority !== "High"
-          ? 1
-          : 0
+        ? 1
+        : 0
     );
 
     setFilteredIssues(data);
   }, [statusFilter, priorityFilter, issues]);
 
-  // Handle Status Change
+  // ✅ status update
   const handleStatusChange = async (issueId, newStatus) => {
     try {
-      const res = await axios.patch(`${backend}/issues/status/${issueId}`, {
+      setLoading(true);
+
+      await axios.patch(`${backend}/issues/status/${issueId}`, {
         status: newStatus,
         updatedBy: user.email,
       });
 
-      
-      setIssues((prev) =>
-        prev.map((i) => (i._id === issueId ? { ...i, ...res.data } : i))
+      toast.success("Status updated");
+
+      // 🔁 optimistic UI update (no refetch)
+      setIssues(prev =>
+        prev.map(issue =>
+          issue._id === issueId
+            ? { ...issue, status: newStatus }
+            : issue
+        )
       );
 
       setOpenDropdown(null);
     } catch (err) {
       console.error(err);
       toast.error("Failed to update status");
+    } finally {
+      setLoading(false);
     }
   };
+
+  // ✅ loader UI
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -89,7 +123,7 @@ const AssignedIssues = () => {
         <select
           className="border p-2 rounded"
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={e => setStatusFilter(e.target.value)}
         >
           <option value="">All Status</option>
           <option value="Pending">Pending</option>
@@ -102,7 +136,7 @@ const AssignedIssues = () => {
         <select
           className="border p-2 rounded"
           value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
+          onChange={e => setPriorityFilter(e.target.value)}
         >
           <option value="">All Priority</option>
           <option value="High">High</option>
@@ -123,39 +157,43 @@ const AssignedIssues = () => {
         </thead>
 
         <tbody>
-          {filteredIssues.map((issue) => (
+          {filteredIssues.map(issue => (
             <tr key={issue._id}>
               <td className="border px-4 py-2">{issue.title}</td>
               <td className="border px-4 py-2">{issue.category}</td>
-              <td className="border px-4 py-2 font-semibold">{issue.status}</td>
+              <td className="border px-4 py-2 font-semibold">
+                {issue.status}
+              </td>
               <td className="border px-4 py-2">{issue.priority}</td>
 
               <td className="border px-4 py-2 relative flex items-center justify-around">
-                
                 <button
-                  className={`px-3 py-1 rounded text-white ${issue.status === "Closed"
+                  className={`px-3 py-1 rounded text-white ${
+                    issue.status === "Closed"
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "btn-btn cursor-pointer"
-                    }`}
+                      : "btn-btn"
+                  }`}
                   disabled={issue.status === "Closed"}
                   onClick={() =>
-                    issue.status !== "Closed" &&
-                    setOpenDropdown(openDropdown === issue._id ? null : issue._id)
+                    setOpenDropdown(
+                      openDropdown === issue._id ? null : issue._id
+                    )
                   }
                 >
                   Change Status
                 </button>
 
-                {/* Dropdown */}
                 {openDropdown === issue._id &&
                   issue.status !== "Closed" &&
                   statusFlow[issue.status]?.length > 0 && (
                     <div className="absolute mt-2 bg-white shadow-lg border rounded p-2 z-10">
-                      {statusFlow[issue.status].map((next) => (
+                      {statusFlow[issue.status].map(next => (
                         <button
                           key={next}
                           className="block w-full text-left px-3 py-1 hover:bg-gray-100"
-                          onClick={() => handleStatusChange(issue._id, next)}
+                          onClick={() =>
+                            handleStatusChange(issue._id, next)
+                          }
                         >
                           {next}
                         </button>
@@ -164,7 +202,7 @@ const AssignedIssues = () => {
                   )}
 
                 <Link to={`/issues/${issue._id}`}>
-                  <button className="px-3 py-1 rounded text-white bg-gray-800 cursor-pointer">
+                  <button className="px-3 py-1 rounded text-white bg-gray-800">
                     View Details
                   </button>
                 </Link>

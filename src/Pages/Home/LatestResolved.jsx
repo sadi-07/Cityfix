@@ -25,23 +25,17 @@ const LatestResolved = () => {
     );
   }
 
-  
-  const latestIssues = [...issues]
-    .filter((i) => i.status === "Closed")
-    .sort((a, b) => new Date(b.resolvedAt || b.updatedAt || b.createdAt) - new Date(a.resolvedAt || a.updatedAt || a.createdAt))
-    .slice(0, 6); 
-
   return (
     <section className="max-w-7xl mx-auto px-4 py-16">
-      <h2 className="text-4xl lg:text-5xl font-extrabold text-center mb-10  text-gradient">
+      <h2 className="text-4xl lg:text-5xl font-extrabold text-center text-gradient mb-10">
         Latest Resolved Issues
       </h2>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {latestIssues.map((issue) => (
+        {issues.map(issue => (
           <div
             key={issue._id}
-            className="bg-gray-100 rounded-lg shadow hover:shadow-lg border border-primary/30 transition"
+            className="bg-gray-100 rounded-lg shadow transition border border-gray-300 hover:scale-103"
           >
             {issue.image && (
               <img
@@ -52,26 +46,24 @@ const LatestResolved = () => {
             )}
 
             <div className="p-5 space-y-2">
-              <h3 className="text-2xl font-bold line-clamp-1">
-                {issue.title}
-              </h3>
+              <h3 className="text-xl font-bold">{issue.title}</h3>
 
-              <p className="text-base text-gray-600">
+              <p className="text-gray-600">
                 <strong>Category:</strong> {issue.category}
               </p>
 
-              <p className="text-base text-gray-600">
+              <p className="text-gray-600">
                 <strong>Location:</strong> {issue.location}
               </p>
 
-              <span className="inline-block px-3 py-1 font-semibold bg-green-300 text-green-700 rounded">
+              <span className="inline-block px-5 py-1 bg-green-200 text-green-700 rounded font-semibold">
                 Resolved
               </span>
 
               <div className="pt-3">
                 <Link
                   to={`/issues/${issue._id}`}
-                  className="inline-block px-4 py-2 bg-gradient text-white font-semibold rounded"
+                  className="inline-block px-4 py-2 bg-primary hover:bg-secondary text-white rounded w-full text-center text-lg font-bold"
                 >
                   View Details
                 </Link>
