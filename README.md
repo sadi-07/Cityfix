@@ -24,3 +24,15 @@ A digital platform where citizens report real-world public infrastructure issues
 10. **User-Friendly Interface:** Clean, responsive design for easy navigation on desktop and mobile.  
 
 ---
+
+
+**Technology Used**
+  1. Javascript
+  2. React
+  3. nodejs
+  4. mongoDb
+  5. express
+  6. Tailwind
+
+
+---  
