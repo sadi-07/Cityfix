@@ -4,11 +4,6 @@ A digital platform where citizens report real-world public infrastructure issues
 
 ---
 
-## Admin Credentials
-- **Email:** admin@gmail.com
-- **Password:** Abcd12
-
----
 
 ## Live Site
 [View Live Site](https://cheery-alpaca-ae1361.netlify.app/)
